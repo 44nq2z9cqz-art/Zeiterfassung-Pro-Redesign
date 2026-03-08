@@ -345,6 +345,14 @@ input, select, textarea { font-family: inherit; }
 .entnahme-betrag.neg { color: var(--red); }
 .icon-btn { width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: .95rem; color: var(--text-3); }
 .icon-btn.danger { background: var(--red-bg); color: var(--red); }
+.icon-action-btn {
+  width: 40px; height: 40px; border-radius: var(--r-sm);
+  background: var(--bg); color: var(--text-1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.icon-action-btn:active { background: var(--sep); }
+
 .no-buchungen { padding: 20px; text-align: center; color: var(--text-4); font-size: .875rem; }
 
 .neue-buchung-btn {

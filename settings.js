@@ -1,7 +1,7 @@
 // Einstellungen v2.3 – nativer iOS-Zeitpicker überall, kein Startsaldo
 const Settings = {
   _page: 'main',
-  APP_VERSION: '3.0.3',
+  APP_VERSION: '3.0.4',
 
   render() {
     const c = document.getElementById('settings-container');
@@ -29,7 +29,7 @@ const Settings = {
       <div class="settings-section mt-16">
         <div class="settings-card">
           <div class="setting-row danger-row">
-            <label><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Alle Daten löschen</label>
+            <label>Alle Daten löschen</label>
             <button class="btn-danger btn-sm" onclick="Settings.deleteAll()"> Löschen</button>
           </div>
         </div>
@@ -193,11 +193,11 @@ const Settings = {
           <div class="settings-card">
             <div class="setting-row">
               <label>Backup erstellen</label>
-              <button class="btn-outline btn-sm" onclick="DB.createBackup()">💾 Download</button>
+              <button class="icon-action-btn" onclick="DB.createBackup()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m16 6-4 4-4-4"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 18h.01"/><path d="M10 18h.01"/></svg></button>
             </div>
             <div class="setting-row">
               <label>Backup wiederherstellen</label>
-              <button class="btn-outline btn-sm" onclick="Settings.triggerRestore()">📂 Datei wählen</button>
+              <button class="icon-action-btn" onclick="Settings.triggerRestore()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6-4-4-4 4"/><path d="M12 2v8"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 18h.01"/><path d="M10 18h.01"/></svg></button>
               <input type="file" id="restore-file" accept=".json" style="display:none"
                 onchange="Settings.doRestore(event)">
             </div>
