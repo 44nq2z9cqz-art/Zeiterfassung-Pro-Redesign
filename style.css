@@ -363,7 +363,8 @@ input, select, textarea { font-family: inherit; }
 .settings-menu-item:last-child { border-bottom: none; }
 .settings-menu-item:active { background: var(--bg); }
 .smi-icon-tile { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.smi-icon-plain { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.smi-icon-plain { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-1); }
+.smi-icon-plain.danger { color: var(--red); }
 .smi-icon  { font-size: 1.15rem; flex-shrink: 0; }
 .smi-label { flex: 1; font-size: 1rem; font-weight: 500; color: var(--text-1); }
 .smi-arrow { color: var(--text-4); font-size: 1rem; }
