@@ -1,7 +1,7 @@
 // Einstellungen v2.3 – nativer iOS-Zeitpicker überall, kein Startsaldo
 const Settings = {
   _page: 'main',
-  APP_VERSION: '3.0.5',
+  APP_VERSION: '3.0.6',
 
   render() {
     const c = document.getElementById('settings-container');
@@ -154,8 +154,7 @@ const Settings = {
             <div class="setting-row">
               <label>Push-Benachrichtigungen</label>
               <div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="s-push" ${s.pushNotifications?'checked':''} onchange="Settings.togglePush(this.checked)"><label class="toggle-label" for="s-push"></label></div>
-                <label for="s-push" class="toggle-label"></label>
-              </div>
+            </div>
             <div class="setting-row">
               <label>Erinnerung Arbeitsbeginn</label>
               <input type="time" class="setting-input" id="s-start-reminder" value="${s.startErinnerung||''}">
@@ -167,8 +166,7 @@ const Settings = {
             <div class="setting-row">
               <label>Benachrichtigung bei Pausen</label>
               <div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="s-push-pause" ${s.pushPauseStart?'checked':''} ><label class="toggle-label" for="s-push-pause"></label></div>
-                <label for="s-push-pause" class="toggle-label"></label>
-              </div>
+            </div>
             <div class="setting-row">
               <label>Erinnerung Datensicherung</label>
               <select class="setting-input" id="s-datensicherung">
