@@ -8,7 +8,7 @@ const Zeitkonto = {
 
     const kachelHtml = (label, wert, cls, icon) => `
       <div class="zk-kachel ${cls}">
-        <div class="zk-icon">${icon}</div>
+        
         <div class="zk-label">${label}</div>
         <div class="zk-wert ${wert<0?'neg':'pos'}">${DB.formatDuration(wert, true)}</div>
         <div class="zk-stand">Stand ${DB.formatDateDE(standDatum)}</div>
@@ -20,10 +20,10 @@ const Zeitkonto = {
         <span class="zk-stand-hint">Stand: Ende ${DB.formatDateDE(standDatum)}</span>
       </div>
       <div class="zk-kacheln-grid">
-        ${kachelHtml('Gesamtsaldo', ue.gesamt, 'zk-gesamt', '')}
+        ${kachelHtml('Gesamtsaldo', ue.gesamt, 'zk-gesamt', '⏱')}
         <div class="zk-row2">
-          ${kachelHtml('Konto 1', ue.sockel, 'zk-sockel', '')}
-          ${kachelHtml('Konto 2', ue.ueberSockel, 'zk-ueber', '')}
+          ${kachelHtml('Konto 1', ue.sockel, 'zk-sockel', '🏦')}
+          ${kachelHtml('Konto 2', ue.ueberSockel, 'zk-ueber', '📈')}
         </div>
       </div>
       <div class="zk-limit-bar">

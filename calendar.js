@@ -43,9 +43,9 @@ const Calendar = {
     const first=new Date(y,m,1); const last=new Date(y,m+1,0);
     const startDow=first.getDay()===0?6:first.getDay()-1;
     const dn=['Mo','Di','Mi','Do','Fr','Sa','So'];
-    let html='<div class="cal-weekdays">';
-    dn.forEach(d=>html+=`<div class="cal-weekday">${d}</div>`);
-    html+='</div><div class="cal-days">'; for(let i=0;i<startDow;i++) html+='<div class="cal-day empty"></div>';
+    let html='<div class="cal-weekdays-row">';
+    dn.forEach(d=>html+=`<div class="cal-weekday-label">${d}</div>`);
+    html+='</div><div class="cal-grid">'; for(let i=0;i<startDow;i++) html+='<div class="cal-cell empty"></div>';
     for(let day=1;day<=last.getDate();day++) {
       const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const dow=new Date(y,m,day).getDay();
@@ -59,15 +59,15 @@ const Calendar = {
       const hasSick     = tagTyp === 'krank';
       const hasHoliday  = !!feiertag;
       const hasIncomplete = !isFut && ds < today && !feiertag && tagTyp !== 'urlaub' && tagTyp !== 'krank' && soll > 0 && ist === null;
-      const cls = ['cal-day',
+      const cls = ['cal-cell',
         isTod ? 'today' : '',
         isSel ? 'selected' : '',
         isFut ? 'future' : '',
-        (dow === 0 || dow === 6) ? 'weekend' : '',
-        hasWork ? 'has-work' : '',
-        hasVacation ? 'has-vacation' : '',
-        hasSick ? 'has-sick' : '',
-        hasHoliday ? 'has-holiday' : '',
+        (dow===0||dow===6) ? 'weekend' : '',
+        hasWork     ? 'has-work'       : '',
+        hasVacation ? 'has-vacation'   : '',
+        hasSick     ? 'has-sick'       : '',
+        hasHoliday  ? 'has-holiday'    : '',
         hasIncomplete ? 'has-incomplete' : ''
       ].filter(Boolean).join(' ');
       html += `<div class="${cls}" onclick="Calendar.selectDay('${ds}')">
@@ -78,7 +78,7 @@ const Calendar = {
     // Detailbereich Platzhalter
     html+=`<div id="cal-detail-area">${this.selectedDate?'':'<p class="cal-hint">Tag antippen für Details</p>'}</div>`;
     // Auswertungen Button
-    html+=`<button class="auswertung-btn" onclick="App.openAuswertungen()">📊 Auswertungen</button>`;
+    html+=`<button class="btn-auswertungen" onclick="App.openAuswertungen()">📊 Auswertungen</button>`;
     return html;
   },
 
@@ -86,7 +86,7 @@ const Calendar = {
   selectDay(dateStr) {
     this.selectedDate = dateStr;
     // Kalender-Zellen aktualisieren
-    document.querySelectorAll('.cal-day.selected').forEach(el=>el.classList.remove('selected'));
+    document.querySelectorAll('.cal-cell.selected').forEach(el=>el.classList.remove('selected'));
     const cell = document.querySelector(`[onclick="Calendar.selectDay('${dateStr}')"]`);
     if (cell) cell.classList.add('selected');
     this._renderDetail(dateStr);
