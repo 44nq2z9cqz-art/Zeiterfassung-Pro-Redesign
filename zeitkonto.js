@@ -28,7 +28,6 @@ const Zeitkonto = {
       </div>
       <div class="zk-limit-bar">
         <div class="zk-limit-label">
-          <span>Sockel-Füllstand</span>
           <span>${DB.formatDuration(ue.sockel)} / ${DB.formatDuration(ue.limit)}</span>
         </div>
         <div class="soll-bar">
@@ -52,14 +51,13 @@ const Zeitkonto = {
       <div class="entnahme-item">
         <div class="entnahme-left">
           <span class="entnahme-datum">${DB.formatDateDE(en.datum)}</span>
-          <span class="entnahme-konto">${en.konto==='sockel'?'Konto 1 · Sockel':'Konto 2 · Über Sockel'}</span>
           ${en.buchungstyp?`<span class="entnahme-tag-badge">${en.buchungstyp}</span>`:''}
           ${en.grund?`<span class="entnahme-grund">${en.grund}</span>`:''}
         </div>
         <div class="entnahme-right">
           <span class="entnahme-betrag ${en.betragMin<0?'pos':'neg'}">${en.betragMin<0?'+':'−'}${DB.formatDuration(Math.abs(en.betragMin))}</span>
           <div class="entnahme-actions">
-            <button class="icon-btn" onclick="App.openEntnahmeEdit(${en.id})">✏️</button>
+            <button class="icon-btn ${en.betragMin<0?'pos':'neg'}" onclick="App.openEntnahmeEdit(${en.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg></button>
             
           </div>
         </div>

@@ -186,6 +186,8 @@ const App = {
     document.getElementById('en-datum').value = existing?.datum || defaultDate || DB.todayStr();
     document.getElementById('en-grund').value = existing?.grund || '';
     document.getElementById('en-modal-title').textContent = existing ? 'Buchung bearbeiten' : 'Neue Zeitkonto-Buchung';
+    const delBtn = document.getElementById('en-delete-btn');
+    if (delBtn) delBtn.style.display = existing ? 'flex' : 'none';
 
     // Vorzeichen: betragMin negativ = Gutschrift
     const isGutschrift = existing ? (existing.betragMin < 0) : false;
@@ -240,6 +242,17 @@ const App = {
 
     this.closeModal('entnahme-modal');
     App.showToast('Buchung gespeichert ✓', 'success');
+    Zeitkonto.render();
+    if (Calendar.selectedDate) Calendar.render();
+  },
+
+  deleteEntnahme() {
+    const id = document.getElementById('en-id').value;
+    if (!id) return;
+    if (!confirm('Buchung wirklich löschen?')) return;
+    DB.deleteEntnahme(parseInt(id));
+    this.closeModal('entnahme-modal');
+    App.showToast('Buchung gelöscht', 'info');
     Zeitkonto.render();
     if (Calendar.selectedDate) Calendar.render();
   },
