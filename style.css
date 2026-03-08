@@ -52,7 +52,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body {
-  font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  font-size: 16px; font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
   background: var(--bg);
   color: var(--text-1);
   min-height: 100vh;
@@ -363,8 +363,9 @@ input, select, textarea { font-family: inherit; }
 .settings-menu-item:last-child { border-bottom: none; }
 .settings-menu-item:active { background: var(--bg); }
 .smi-icon-tile { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.smi-icon-plain { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .smi-icon  { font-size: 1.15rem; flex-shrink: 0; }
-.smi-label { flex: 1; font-size: .92rem; font-weight: 500; color: var(--text-1); }
+.smi-label { flex: 1; font-size: 1rem; font-weight: 500; color: var(--text-1); }
 .smi-arrow { color: var(--text-4); font-size: 1rem; }
 
 .subpage-header { display: flex; align-items: center; gap: 10px; padding-bottom: 14px; border-bottom: 0.5px solid var(--sep); margin-bottom: 14px; }
@@ -374,7 +375,7 @@ input, select, textarea { font-family: inherit; }
 .settings-info-box { background: var(--green-bg); border-radius: var(--r-sm); padding: 10px 14px; font-size: .82rem; color: var(--green); margin-bottom: 12px; line-height: 1.4; }
 .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; border-bottom: 0.5px solid var(--sep); background: var(--card); }
 .setting-row:last-child { border-bottom: none; }
-.setting-row label { font-size: .9rem; color: var(--text-1); font-weight: 500; flex: 1; margin-right: 10px; }
+.setting-row label { font-size: .95rem; color: var(--text-1); font-weight: 500; flex: 1; margin-right: 10px; }
 .setting-row-col { flex-direction: column; align-items: flex-start; gap: 10px; }
 .setting-input { font-size: .9rem; color: var(--text-1); background: var(--bg); border: 1.5px solid var(--sep); border-radius: var(--r-sm); padding: 7px 10px; }
 .label-hint { font-size: .7rem; color: var(--text-4); font-weight: 400; margin-left: 4px; }

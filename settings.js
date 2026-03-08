@@ -1,7 +1,7 @@
 // Einstellungen v2.3 – nativer iOS-Zeitpicker überall, kein Startsaldo
 const Settings = {
   _page: 'main',
-  APP_VERSION: '3.0.0',
+  APP_VERSION: '3.0.1',
 
   render() {
     const c = document.getElementById('settings-container');
@@ -14,24 +14,24 @@ const Settings = {
     c.innerHTML = `
       <div class="settings-menu">
         ${[
-          ['arbeitszeit',  '#4a7c59',
-           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+          ['arbeitszeit',
+           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
            'Einstellungen Arbeitszeit'],
-          ['zeitkonto',    '#3a5fa0',
-           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+          ['zeitkonto',
+           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
            'Einstellungen Zeitkonto'],
-          ['timetracking', '#7a6030',
-           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
+          ['timetracking',
+           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="1.8"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
            'Timetracking'],
-          ['notifications','#8B3A3A',
-           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+          ['notifications',
+           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
            'Benachrichtigungen'],
-          ['daten',        '#5a5a6a',
-           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+          ['daten',
+           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="1.8"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
            'Daten & Backup'],
-        ].map(([p,color,svg,lb]) => `
+        ].map(([p,svg,lb]) => `
           <div class="settings-menu-item" onclick="Settings.goTo('${p}')">
-            <span class="smi-icon-tile" style="background:${color}">${svg}</span>
+            <span class="smi-icon-plain">${svg}</span>
             <span class="smi-label">${lb}</span>
             <span class="smi-arrow">›</span>
           </div>`).join('')}
@@ -163,11 +163,9 @@ const Settings = {
           <div class="settings-card">
             <div class="setting-row">
               <label>Push-Benachrichtigungen</label>
-              <div class="toggle-wrap">
-                <div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="s-push" ${s.pushNotifications?'checked':''} onchange="Settings.togglePush(this.checked)"><label class="toggle-label" for="s-push"></label></div>
+              <div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="s-push" ${s.pushNotifications?'checked':''} onchange="Settings.togglePush(this.checked)"><label class="toggle-label" for="s-push"></label></div>
                 <label for="s-push" class="toggle-label"></label>
               </div>
-            </div>
             <div class="setting-row">
               <label>Erinnerung Arbeitsbeginn</label>
               <input type="time" class="setting-input" id="s-start-reminder" value="${s.startErinnerung||''}">
@@ -178,11 +176,9 @@ const Settings = {
             </div>
             <div class="setting-row">
               <label>Benachrichtigung bei Pausen</label>
-              <div class="toggle-wrap">
-                <div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="s-push-pause" ${s.pushPauseStart?'checked':''} ><label class="toggle-label" for="s-push-pause"></label></div>
+              <div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="s-push-pause" ${s.pushPauseStart?'checked':''} ><label class="toggle-label" for="s-push-pause"></label></div>
                 <label for="s-push-pause" class="toggle-label"></label>
               </div>
-            </div>
             <div class="setting-row">
               <label>Erinnerung Datensicherung</label>
               <select class="setting-input" id="s-datensicherung">
