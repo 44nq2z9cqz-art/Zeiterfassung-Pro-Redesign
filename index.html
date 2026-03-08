@@ -14,11 +14,8 @@
 </head>
 <body>
 
-  <header class="app-header">
-    <h1>Zeiterfassung</h1>
-  </header>
+  <header class="app-header"><h1>Zeiterfassung</h1></header>
 
-  <!-- Tab: Heute -->
   <div id="tab-today" class="tab-content active">
     <div id="timer-section"></div>
     <div class="pausen-card">
@@ -27,7 +24,6 @@
     </div>
   </div>
 
-  <!-- Tab: Kalender -->
   <div id="tab-calendar" class="tab-content">
     <div class="calendar-nav">
       <button class="cal-nav-btn" onclick="Calendar.prevPeriod()">‹</button>
@@ -37,17 +33,14 @@
     <div id="calendar-container"></div>
   </div>
 
-  <!-- Tab: Zeitkonto -->
   <div id="tab-zeitkonto" class="tab-content">
     <div id="zeitkonto-container"></div>
   </div>
 
-  <!-- Tab: Einstellungen -->
   <div id="tab-settings" class="tab-content">
     <div id="settings-container"></div>
   </div>
 
-  <!-- Bottom Tab Bar -->
   <nav class="bottom-nav">
     <button class="tab-btn active" data-tab="today" onclick="App.switchTab('today')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -69,9 +62,7 @@
 
   <div id="toast-container"></div>
 
-  <!-- ══════════ MODALS ══════════ -->
-
-  <!-- Zeit bearbeiten -->
+  <!-- MODALS -->
   <div class="modal-overlay" id="edit-zeit-modal" onclick="App.closeModal('edit-zeit-modal')">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -89,7 +80,6 @@
     </div>
   </div>
 
-  <!-- Sollzeit bearbeiten -->
   <div class="modal-overlay" id="edit-soll-modal" onclick="App.closeModal('edit-soll-modal')">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -104,7 +94,6 @@
     </div>
   </div>
 
-  <!-- Kommentar bearbeiten -->
   <div class="modal-overlay" id="edit-kommentar-modal" onclick="App.closeModal('edit-kommentar-modal')">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -114,19 +103,18 @@
       <div class="modal-body">
         <input type="hidden" id="ek-date">
         <div class="quick-tags">
-          <button class="quick-tag" data-tag="Urlaubstag"    onclick="App.setQuickKommentar('Urlaubstag',this)">🏖 Urlaub</button>
-          <button class="quick-tag" data-tag="Krankheitstag" onclick="App.setQuickKommentar('Krankheitstag',this)">🤒 Krank</button>
-          <button class="quick-tag" data-tag="Homeoffice"    onclick="App.setQuickKommentar('Homeoffice',this)">🏠 HO</button>
-          <button class="quick-tag" data-tag="Gleittag"      onclick="App.setQuickKommentar('Gleittag',this)">↕ Gleittag</button>
-          <button class="quick-tag" data-tag="Dienstreise"   onclick="App.setQuickKommentar('Dienstreise',this)">✈ Reise</button>
+          <button class="quick-tag" data-tag="Urlaubstag"    onclick="App.setQuickKommentar('Urlaubstag',this)">Urlaub</button>
+          <button class="quick-tag" data-tag="Krankheitstag" onclick="App.setQuickKommentar('Krankheitstag',this)">Krank</button>
+          <button class="quick-tag" data-tag="Homeoffice"    onclick="App.setQuickKommentar('Homeoffice',this)">Homeoffice</button>
+          <button class="quick-tag" data-tag="Gleittag"      onclick="App.setQuickKommentar('Gleittag',this)">Gleittag</button>
+          <button class="quick-tag" data-tag="Dienstreise"   onclick="App.setQuickKommentar('Dienstreise',this)">Dienstreise</button>
         </div>
-        <textarea class="form-input" id="ek-kommentar" rows="3" placeholder="Freitext…"></textarea>
+        <textarea class="form-input mt-8" id="ek-kommentar" rows="3" placeholder="Freitext…"></textarea>
         <button class="btn-primary btn-full mt-8" onclick="App.saveKommentar()">Speichern</button>
       </div>
     </div>
   </div>
 
-  <!-- Pausen bearbeiten -->
   <div class="modal-overlay" id="edit-pausen-modal" onclick="App.closeModal('edit-pausen-modal')">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -138,7 +126,7 @@
         <div id="ep-pausen-list"></div>
         <div class="pause-add-row">
           <input type="time" class="form-input" id="ep-start">
-          <span style="color:var(--ios-text-secondary)">–</span>
+          <span style="color:var(--text-3)">–</span>
           <input type="time" class="form-input" id="ep-end">
           <button class="btn-primary btn-sm" onclick="App.addPauseFromModal()">+</button>
         </div>
@@ -146,7 +134,6 @@
     </div>
   </div>
 
-  <!-- Kontobuchung -->
   <div class="modal-overlay" id="entnahme-modal" onclick="App.closeModal('entnahme-modal')">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -170,16 +157,15 @@
           <label class="form-label">Betrag (h:min)</label>
           <div class="native-time-wrap">
             <input type="text" id="en-time-input" class="ntf-input hhmm-input"
-              value="000:00" placeholder="000:00"
-              inputmode="numeric"
+              value="000:00" placeholder="000:00" inputmode="numeric"
               onblur="this.value=this.value.replace(/[^0-9:]/g,'')">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Buchungstyp</label>
           <div class="quick-tags">
-            <button class="en-tag quick-tag" data-tag="Auszahlung" onclick="App.setEntnahmeTag('Auszahlung',this)">💸 Auszahlung</button>
-            <button class="en-tag quick-tag" data-tag="Korrektur"  onclick="App.setEntnahmeTag('Korrektur',this)">⚖ Korrektur</button>
+            <button class="en-tag quick-tag" data-tag="Auszahlung" onclick="App.setEntnahmeTag('Auszahlung',this)">Auszahlung</button>
+            <button class="en-tag quick-tag" data-tag="Korrektur"  onclick="App.setEntnahmeTag('Korrektur',this)">Korrektur</button>
           </div>
         </div>
         <div class="form-group">
@@ -191,7 +177,6 @@
     </div>
   </div>
 
-  <!-- Auswertungen -->
   <div class="modal-overlay" id="au-modal" onclick="App.closeModal('au-modal')">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -214,8 +199,8 @@
           <input type="date" class="form-input" id="au-bis">
         </div>
         <div class="au-actions">
-          <button class="btn-primary btn-full" onclick="App.doExportCSV()">📊 CSV exportieren</button>
-          <button class="auswertung-btn mt-8" onclick="App.doExportPDF()">📄 PDF Bericht</button>
+          <button class="btn-primary btn-full" onclick="App.doExportCSV()">CSV exportieren</button>
+          <button class="auswertung-btn" onclick="App.doExportPDF()">PDF Bericht</button>
         </div>
       </div>
     </div>

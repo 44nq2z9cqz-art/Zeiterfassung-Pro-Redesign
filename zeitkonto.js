@@ -20,10 +20,10 @@ const Zeitkonto = {
         <span class="zk-stand-hint">Stand: Ende ${DB.formatDateDE(standDatum)}</span>
       </div>
       <div class="zk-kacheln-grid">
-        ${kachelHtml('Gesamtsaldo', ue.gesamt, 'zk-gesamt', '⏱')}
+        ${kachelHtml('Gesamtsaldo', ue.gesamt, 'zk-gesamt', '')}
         <div class="zk-row2">
-          ${kachelHtml('Konto 1', ue.sockel, 'zk-sockel', '🏦')}
-          ${kachelHtml('Konto 2', ue.ueberSockel, 'zk-ueber', '📈')}
+          ${kachelHtml('Konto 1', ue.sockel, 'zk-sockel', '')}
+          ${kachelHtml('Konto 2', ue.ueberSockel, 'zk-ueber', '')}
         </div>
       </div>
       <div class="zk-limit-bar">

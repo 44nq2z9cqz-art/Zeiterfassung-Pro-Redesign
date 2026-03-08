@@ -14,11 +14,21 @@ const Settings = {
     c.innerHTML = `
       <div class="settings-menu">
         ${[
-          ['arbeitszeit', '#34C759', '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', 'Einstellungen Arbeitszeit'],
-          ['zeitkonto',   '#007AFF', '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', 'Einstellungen Zeitkonto'],
-          ['timetracking','#FF9500', '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>', 'Timetracking'],
-          ['notifications','#FF3B30','<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>', 'Benachrichtigungen'],
-          ['daten',       '#8E8E93', '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>', 'Daten & Backup'],
+          ['arbeitszeit',  '#34C759',
+           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+           'Einstellungen Arbeitszeit'],
+          ['zeitkonto',    '#4A7FB5',
+           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+           'Einstellungen Zeitkonto'],
+          ['timetracking', '#FF9500',
+           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
+           'Timetracking'],
+          ['notifications','#FF3B30',
+           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+           'Benachrichtigungen'],
+          ['daten',        '#8E8E93',
+           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+           'Daten & Backup'],
         ].map(([p,color,svg,lb]) => `
           <div class="settings-menu-item" onclick="Settings.goTo('${p}')">
             <span class="smi-icon-tile" style="background:${color}">${svg}</span>
@@ -30,7 +40,7 @@ const Settings = {
         <div class="settings-card">
           <div class="setting-row danger-row">
             <label>Alle Daten löschen</label>
-            <button class="btn-danger btn-sm" onclick="Settings.deleteAll()">🗑 Löschen</button>
+            <button class="btn-danger btn-sm" onclick="Settings.deleteAll()"> Löschen</button>
           </div>
         </div>
       </div>

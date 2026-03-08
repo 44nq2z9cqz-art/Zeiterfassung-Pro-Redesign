@@ -314,6 +314,45 @@ const App = {
     return result;
   },
 
+  _buildZKRows(rows, all, von, bis) {
+    const s2 = DB.getSettings();
+    const limit2 = s2.ueberstundenSockelLimit;
+    const enAll = DB.getEntnahmen().filter(e => (!von || e.datum >= von) && (!bis || e.datum <= bis));
+    const enMap2 = {};
+    enAll.forEach(e => { (enMap2[e.datum] = enMap2[e.datum] || []).push(e); });
+    const dates2 = [...new Set([
+      ...rows.filter(r => r.ds).map(r => r.ds),
+      ...enAll.map(e => e.datum)
+    ])].sort();
+    let lS = 0, lU = 0, result = '';
+    const fmtD = v => DB.formatDuration(v, true);
+    for (const d of dates2) {
+      const e2 = all[d];
+      if (e2 && e2.start && e2.end) {
+        const diff2 = DB.getDiffMinuten(d);
+        if (diff2 > 0) { const r2 = Math.max(0, limit2 - lS); lS += Math.min(diff2, r2); lU += diff2 - Math.min(diff2, r2); }
+        else if (diff2 < 0) { const a2 = Math.abs(diff2); const as2 = Math.min(a2, lS); lS -= as2; lU -= Math.min(a2 - as2, lU); }
+        if (diff2 !== 0) result += '<tr><td>' + DB.formatDateDE(d) + '</td><td>Arbeitstag</td>'
+          + '<td class="' + (diff2 >= 0 ? 'pos' : 'neg') + '">' + fmtD(diff2) + '</td>'
+          + '<td>' + DB.formatDuration(lS) + '</td><td>' + DB.formatDuration(lU) + '</td>'
+          + '<td class="' + ((lS + lU) >= 0 ? 'pos' : 'neg') + '">' + DB.formatDuration(lS + lU) + '</td></tr>';
+      }
+      if (enMap2[d]) {
+        enMap2[d].forEach(en2 => {
+          const b = en2.betragMin;
+          if (b > 0) { const aU = Math.min(b, Math.max(0, lU)); lU -= aU; lS = Math.max(-999999, lS - (b - aU)); }
+          else if (b < 0) { const gv = Math.abs(b); const r2 = Math.max(0, limit2 - lS); lS += Math.min(gv, r2); lU += gv - Math.min(gv, r2); }
+          result += '<tr class="sp"><td>' + DB.formatDateDE(d) + '</td>'
+            + '<td>Buchung: ' + (en2.buchungstyp || '') + ' ' + (en2.grund || '') + '</td>'
+            + '<td class="' + (b <= 0 ? 'pos' : 'neg') + '">' + fmtD(b) + '</td>'
+            + '<td>' + DB.formatDuration(lS) + '</td><td>' + DB.formatDuration(lU) + '</td>'
+            + '<td class="' + ((lS + lU) >= 0 ? 'pos' : 'neg') + '">' + DB.formatDuration(lS + lU) + '</td></tr>';
+        });
+      }
+    }
+    return result;
+  },
+
   generatePDF(von, bis) {
     const all = DB.getEintraege(); const s = DB.getSettings();
     const wt = ['So','Mo','Di','Mi','Do','Fr','Sa'];

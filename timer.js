@@ -161,12 +161,12 @@ const Timer = {
     const datumStr = heute.toLocaleDateString('de-DE', {day:'2-digit',month:'long',year:'numeric'});
 
     let badge = '';
-    if (feiertag)               badge=`<span class="badge badge-holiday">🎉 ${feiertag}</span>`;
-    else if (tagTyp==='urlaub') badge=`<span class="badge badge-vacation">🏖 Urlaubstag</span>`;
-    else if (tagTyp==='krank')  badge=`<span class="badge badge-sick">🤒 Kranktag</span>`;
-    else if (this.state.pauseLaufend) badge=`<span class="badge badge-pause">⏸ Pause</span>`;
-    else if (this.state.laufend) badge=`<span class="badge badge-running">● Läuft</span>`;
-    else if (e?.end)             badge=`<span class="badge badge-done">✓ Abgeschlossen</span>`;
+    if (feiertag)               badge=`<span class="badge badge-holiday">${feiertag}</span>`;
+    else if (tagTyp==='urlaub') badge=`<span class="badge badge-vacation">Urlaubstag</span>`;
+    else if (tagTyp==='krank')  badge=`<span class="badge badge-sick">Kranktag</span>`;
+    else if (this.state.pauseLaufend) badge=`<span class="badge badge-pause">Pause</span>`;
+    else if (this.state.laufend) badge=`<span class="badge badge-running">Läuft</span>`;
+    else if (e?.end)             badge=`<span class="badge badge-done">Abgeschlossen</span>`;
 
     const pauGesamt = (e?.pausen||[]).reduce((a,p)=>a+(p.dauer||0),0);
 
@@ -206,7 +206,7 @@ const Timer = {
           <div class="soll-bar"><div class="soll-bar-fill ${diff!==null&&diff>=0?'over':''}"
             style="width:${ist!==null?Math.min(100,Math.round(ist/soll*100)):0}%"></div></div>
         </div>`:''}
-        ${e?.kommentar?`<div class="timer-kommentar"><span>💬</span><span>${e.kommentar}</span></div>`:''}
+        ${e?.kommentar?`<div class="timer-kommentar"><span></span><span>${e.kommentar}</span></div>`:''}
         <div class="timer-buttons">${this._renderButtons(e, feiertag, tagTyp, soll)}</div>
       </div>
       ${this.state.pauseLaufend?`
@@ -226,7 +226,7 @@ const Timer = {
     if (this.state.laufend)
       return `<div class="btn-row">
         ${!this.state.pauseLaufend
-          ?`<button class="btn-secondary" onclick="Timer.pauseStart()">⏸ Pause</button>`
+          ?`<button class="btn-secondary" onclick="Timer.pauseStart()">Pause</button>`
           :`<button class="btn-pause-end" onclick="Timer.pauseEnde()">▶ Pause beenden</button>`}
         <button class="btn-danger" onclick="Timer.arbeitsEnde()">⏹ Beenden</button>
       </div>`;

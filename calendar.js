@@ -43,9 +43,9 @@ const Calendar = {
     const first=new Date(y,m,1); const last=new Date(y,m+1,0);
     const startDow=first.getDay()===0?6:first.getDay()-1;
     const dn=['Mo','Di','Mi','Do','Fr','Sa','So'];
-    let html='<div class="calendar-grid"><div class="cal-weekdays">';
+    let html='<div class="cal-weekdays">';
     dn.forEach(d=>html+=`<div class="cal-weekday">${d}</div>`);
-    '</div><div class="cal-days">'; for(let i=0;i<startDow;i++) html+='<div class="cal-day empty"></div>';
+    html+='</div><div class="cal-days">'; for(let i=0;i<startDow;i++) html+='<div class="cal-day empty"></div>';
     for(let day=1;day<=last.getDate();day++) {
       const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const dow=new Date(y,m,day).getDay();
@@ -54,23 +54,23 @@ const Calendar = {
       const feiertag=window.Feiertage.isFeiertag(ds,y);
       const soll=DB.getSollMinuten(ds,s); const ist=e?DB.calcArbeitszeit(e):null;
       const diff=ist!==null&&soll>0?ist-soll:null;
-      let dot='';
-      if(!isFut&&soll>0&&!feiertag&&tagTyp!=='urlaub'&&tagTyp!=='krank') {
-        dot=ist!==null?`<span class="status-dot ${diff>=0?'dot-ok':'dot-minus'}"></span>`
-                      :`<span class="status-dot dot-missing"></span>`;
-      }
-      // has-* classes for iOS status strip
-      const hasWork    = !isFut && ist !== null && !feiertag && tagTyp !== 'urlaub' && tagTyp !== 'krank';
-      const hasVacation= tagTyp === 'urlaub';
-      const hasSick    = tagTyp === 'krank';
-      const hasHoliday = !!feiertag;
-      const hasIncomplete = !isFut && !feiertag && tagTyp !== 'urlaub' && tagTyp !== 'krank' && soll > 0 && ist === null && ds < today;
-      const cls=['cal-day',isTod?'today':'',isSel?'selected':'',isFut?'future':'',
-        (dow===0||dow===6)?'weekend':'',
-        hasWork?'has-work':'', hasVacation?'has-vacation':'',
-        hasSick?'has-sick':'', hasHoliday?'has-holiday':'',
-        hasIncomplete?'has-incomplete':''].filter(Boolean).join(' ');
-      html+=`<div class="${cls}" onclick="Calendar.selectDay('${ds}')">
+      const hasWork     = !isFut && ist !== null;
+      const hasVacation = tagTyp === 'urlaub';
+      const hasSick     = tagTyp === 'krank';
+      const hasHoliday  = !!feiertag;
+      const hasIncomplete = !isFut && ds < today && !feiertag && tagTyp !== 'urlaub' && tagTyp !== 'krank' && soll > 0 && ist === null;
+      const cls = ['cal-day',
+        isTod ? 'today' : '',
+        isSel ? 'selected' : '',
+        isFut ? 'future' : '',
+        (dow === 0 || dow === 6) ? 'weekend' : '',
+        hasWork ? 'has-work' : '',
+        hasVacation ? 'has-vacation' : '',
+        hasSick ? 'has-sick' : '',
+        hasHoliday ? 'has-holiday' : '',
+        hasIncomplete ? 'has-incomplete' : ''
+      ].filter(Boolean).join(' ');
+      html += `<div class="${cls}" onclick="Calendar.selectDay('${ds}')">
         <div class="cal-day-num">${day}</div>
       </div>`;
     }
