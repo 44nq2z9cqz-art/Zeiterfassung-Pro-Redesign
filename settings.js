@@ -1,7 +1,7 @@
 // Einstellungen v2.3 – nativer iOS-Zeitpicker überall, kein Startsaldo
 const Settings = {
   _page: 'main',
-  APP_VERSION: '3.0.4',
+  APP_VERSION: '3.0.5',
 
   render() {
     const c = document.getElementById('settings-container');
@@ -29,7 +29,7 @@ const Settings = {
       <div class="settings-section mt-16">
         <div class="settings-card">
           <div class="setting-row danger-row">
-            <label>Alle Daten löschen</label>
+            <label><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Alle Daten löschen</label>
             <button class="btn-danger btn-sm" onclick="Settings.deleteAll()"> Löschen</button>
           </div>
         </div>
