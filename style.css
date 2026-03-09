@@ -646,13 +646,15 @@ input[type="time"].ntf-input { font-family: inherit; }
 /* ── Timer running indicator — positioned over right side ── */
 .timer-running-indicator {
   position: absolute;
-  /* Centered over 4th kachel, vertically centered in the header zone */
+  /* Float over the 4th (ARBEITSZEIT) kachel */
   right: 0;
-  width: 25%;
-  top: 14px;
-  height: 56px; /* matches header text block height */
+  width: 28%;
+  /* Top of kachels: header ~65px + padding ~16px gap */
+  top: 68px;
+  height: 128px;
   display: flex; align-items: center; justify-content: center;
   pointer-events: none;
+  z-index: 2;
 }
 /* Make timer-card relative for positioning */
 .timer-card { position: relative; overflow: visible; }
