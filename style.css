@@ -644,18 +644,7 @@ input[type="time"].ntf-input { font-family: inherit; }
    ═══════════════════════════════════════════════ */
 
 /* ── Timer running indicator — positioned over right side ── */
-.timer-running-indicator {
-  position: absolute;
-  /* Float over the 4th (ARBEITSZEIT) kachel */
-  right: 0;
-  width: 28%;
-  /* Top of kachels: header ~65px + padding ~16px gap */
-  top: 68px;
-  height: 128px;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: none;
-  z-index: 2;
-}
+
 /* Make timer-card relative for positioning */
 .timer-card { position: relative; overflow: visible; }
 
@@ -701,3 +690,21 @@ input[type="time"].ntf-input { font-family: inherit; }
 
 /* ── Remove canvas artifacts ────────────────────── */
 #anim-canvas { display: none; }
+
+/* ── Kachel indicator — floats above 4th kachel ── */
+.kachel-indicator {
+  position: absolute;
+  /* Horizontally: rightmost 25% of card = over ARBEITSZEIT kachel */
+  right: 0;
+  width: 25%;
+  /* Vertically: between card top edge and top of kacheln */
+  /* Card padding-top ~16px, header ~58px → kacheln start at ~74px */
+  /* Center in that 74px zone */
+  top: 0;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
