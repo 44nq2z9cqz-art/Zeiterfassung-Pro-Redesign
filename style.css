@@ -128,7 +128,7 @@ input, select, textarea { font-family: inherit; }
 
 /* Zeit-Blöcke */
 .timer-zeiten { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
-.zeit-block { background: white; border-radius: var(--r-sm); padding: 10px 6px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+.zeit-block { background: white; border-radius: var(--r-sm); padding: 10px 6px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); height: 72px; box-sizing: border-box; }
 .zeit-block.highlight { background: var(--green-bg); }
 .zeit-label { display: block; font-size: .58rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .zeit-wert  { display: block; font-size: 1.05rem; font-weight: 700; color: var(--text-1); letter-spacing: -0.3px; }
@@ -702,7 +702,7 @@ input[type="time"].ntf-input { font-family: inherit; }
      → kachel top edge at ~79px from card top.
      Center icon (64px) in that 79px zone → top = (79 - 64) / 2 = 7px */
   top: 7px;
-  height: 64px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
