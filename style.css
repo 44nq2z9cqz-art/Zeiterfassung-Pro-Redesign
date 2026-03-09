@@ -694,14 +694,15 @@ input[type="time"].ntf-input { font-family: inherit; }
 /* ── Kachel indicator — floats above 4th kachel ── */
 .kachel-indicator {
   position: absolute;
-  /* Horizontally: rightmost 25% of card = over ARBEITSZEIT kachel */
-  right: 0;
-  width: 25%;
-  /* Vertically: between card top edge and top of kacheln */
-  /* Card padding-top ~16px, header ~58px → kacheln start at ~74px */
-  /* Center in that 74px zone */
-  top: 0;
-  height: 74px;
+  /* Horizontally centered over the 4th (ARBEITSZEIT) kachel.
+     Card padding: var(--sp) on each side. 4 equal kacheln → rightmost = right 25%. */
+  right: var(--sp);
+  width: calc(25% - var(--sp) / 2);
+  /* Vertically: card padding-top 20px, weekday ~17px, datum ~26px, margin-bottom 16px
+     → kachel top edge at ~79px from card top.
+     Center icon (64px) in that 79px zone → top = (79 - 64) / 2 = 7px */
+  top: 7px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
