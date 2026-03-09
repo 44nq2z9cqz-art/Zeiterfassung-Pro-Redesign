@@ -128,7 +128,7 @@ input, select, textarea { font-family: inherit; }
 
 /* Zeit-Blöcke */
 .timer-zeiten { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
-.zeit-block { background: var(--bg); border-radius: var(--r-sm); padding: 10px 6px; text-align: center; }
+.zeit-block { background: white; border-radius: var(--r-sm); padding: 10px 6px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
 .zeit-block.highlight { background: var(--green-bg); }
 .zeit-label { display: block; font-size: .58rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .zeit-wert  { display: block; font-size: 1.05rem; font-weight: 700; color: var(--text-1); letter-spacing: -0.3px; }
@@ -646,9 +646,13 @@ input[type="time"].ntf-input { font-family: inherit; }
 /* ── Timer running indicator — positioned over right side ── */
 .timer-running-indicator {
   position: absolute;
-  right: 14px;
+  /* Centered over 4th kachel, vertically centered in the header zone */
+  right: 0;
+  width: 25%;
   top: 14px;
+  height: 56px; /* matches header text block height */
   display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
 }
 /* Make timer-card relative for positioning */
 .timer-card { position: relative; overflow: visible; }
@@ -661,19 +665,7 @@ input[type="time"].ntf-input { font-family: inherit; }
 /* Override blink speed to 1.8s (50% slower than 1.2s) */
 .blink-icon { animation: blink 1.8s ease-in-out infinite; }
 
-/* ── Timer zeit-blocks — match Zeitkonto kachel style ── */
-.timer-zeiten {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 10px; margin: 14px 0;
-}
-.zeit-block {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  padding: 12px 14px;
-  display: flex; flex-direction: column; gap: 3px;
-}
-.zeit-block.highlight { grid-column: span 1; }
+/* timer-zeiten: see original definition above */
 
 /* ── Timer buttons — bigger icon-only ───────────── */
 .btn-end {
