@@ -105,7 +105,7 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="es-date">
-        <div id="es-drum-wrap"></div>
+        <input type="time" class="time-native-input" id="es-time-input" step="60">
         <button class="btn-primary btn-full mt-16" onclick="App.saveSoll()">Speichern</button>
       </div>
     </div>
@@ -246,7 +246,7 @@
 
 
   <!-- CALENDAR DAY OVERLAY -->
-  <div class="modal" id="cal-overlay" onclick="event.target===this&&App.closeModal('cal-overlay')">
+  <div class="modal" id="cal-overlay" style="z-index:700" onclick="event.target===this&&App.closeModal('cal-overlay')">
     <div class="modal-overlay" onclick="App.closeModal('cal-overlay')"></div>
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-handle"></div>

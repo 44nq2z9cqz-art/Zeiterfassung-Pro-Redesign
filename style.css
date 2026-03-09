@@ -638,3 +638,72 @@ input[type="time"].ntf-input { font-family: inherit; }
 
 /* ── Auswertungen button — no emoji, correct green ── */
 .btn-auswertungen { background: var(--green); }
+
+/* ═══════════════════════════════════════════════
+   v3.2 ADDITIONS
+   ═══════════════════════════════════════════════ */
+
+/* ── Timer running indicator — positioned over right side ── */
+.timer-running-indicator {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Make timer-card relative for positioning */
+.timer-card { position: relative; overflow: visible; }
+
+/* ── Indicator icons bigger blink speed ─────────── */
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.25; }
+}
+/* Override blink speed to 1.8s (50% slower than 1.2s) */
+.blink-icon { animation: blink 1.8s ease-in-out infinite; }
+
+/* ── Timer zeit-blocks — match Zeitkonto kachel style ── */
+.timer-zeiten {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin: 14px 0;
+}
+.zeit-block {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.zeit-block.highlight { grid-column: span 1; }
+
+/* ── Timer buttons — bigger icon-only ───────────── */
+.btn-end {
+  background: #9b2c2c; color: white;
+  border-radius: var(--r); padding: 15px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 10px rgba(155,44,44,0.25);
+}
+.btn-end:active { opacity: 0.8; }
+
+/* ── Soll bar fill always green ─────────────────── */
+.soll-bar-fill { background: var(--green) !important; }
+
+/* ── Zeitkonto bar label flex ───────────────────── */
+.zk-limit-label { display: flex; justify-content: space-between; align-items: center; }
+.zk-bar-left    { font-size: .8rem; font-weight: 700; color: var(--text-3); }
+.zk-bar-right   { font-size: .8rem; font-weight: 700; color: var(--green); }
+
+/* ── Zeitkonto year/month groups ────────────────── */
+.zk-year-group  { margin-bottom: 6px; }
+.zk-year-header { background: rgba(74,124,89,0.07) !important; }
+.zk-month-group { margin-top: 4px; margin-left: 8px; }
+.zk-month-header { background: var(--bg) !important; }
+
+/* ── Cal overlay comment field spacing ──────────── */
+.co-fields-comment { margin-top: 10px; }
+
+/* ── Edit soll time input ───────────────────────── */
+.time-input-group { margin-bottom: 12px; }
+.time-input-label { display: block; font-size: .8rem; color: var(--text-3); margin-bottom: 6px; font-weight: 600; }
+
+/* ── Remove canvas artifacts ────────────────────── */
+#anim-canvas { display: none; }

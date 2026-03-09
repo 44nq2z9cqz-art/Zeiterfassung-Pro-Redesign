@@ -29,7 +29,8 @@ const Zeitkonto = {
       </div>
       <div class="zk-limit-bar">
         <div class="zk-limit-label">
-          <span>Konto 1 &nbsp; ${DB.formatDuration(ue.sockel)} / ${DB.formatDuration(ue.limit)}</span>
+          <span class="zk-bar-left">Konto 1</span>
+          <span class="zk-bar-right">${DB.formatDuration(ue.sockel)} / ${DB.formatDuration(ue.limit)}</span>
         </div>
         <div class="soll-bar">
           <div class="soll-bar-fill ${ue.sockel>=ue.limit?'over':''}"
@@ -49,7 +50,6 @@ const Zeitkonto = {
     if (!list.length) return '<p class="no-data">Noch keine Buchungen</p>';
 
     const sorted = [...list].sort((a,b) => b.datum.localeCompare(a.datum));
-    const today  = DB.todayStr();
     const now    = new Date();
 
     // Week boundary (Monday)
@@ -58,74 +58,107 @@ const Zeitkonto = {
     weekStart.setHours(0,0,0,0);
     const weekStartStr = DB.dateToStr(weekStart);
 
-    // Group: current week first, then by year-month
-    const groups = {}; // key → { label, items[], expanded }
+    // Structure: { __week__: items[], years: { 2025: { '2025-03': items[] } } }
+    const weekItems = [];
+    const byYear = {}; // year → { month-key → items[] }
+
     sorted.forEach(en => {
-      let key;
       if (en.datum >= weekStartStr) {
-        key = '__week__';
+        weekItems.push(en);
       } else {
         const [y, m] = en.datum.split('-');
-        key = `${y}-${m}`;
+        if (!byYear[y]) byYear[y] = {};
+        const mk = `${y}-${m}`;
+        if (!byYear[y][mk]) byYear[y][mk] = [];
+        byYear[y][mk].push(en);
       }
-      if (!groups[key]) groups[key] = { items: [] };
-      groups[key].items.push(en);
     });
 
-    // Determine which groups are expanded (stored in memory)
-    if (!this._expanded) this._expanded = { '__week__': true };
+    // Init expanded state: only current week open, everything else closed
+    if (!this._expanded) {
+      this._expanded = { '__week__': true };
+    }
 
     const monthNames = ['Januar','Februar','März','April','Mai','Juni',
                         'Juli','August','September','Oktober','November','Dezember'];
+    const arrowSvg = (open) => `<svg class="zk-group-arrow ${open?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+    const renderItems = (items) => items.map(en => {
+      const pos = en.betragMin < 0;
+      return `<div class="entnahme-item">
+        <div class="entnahme-left">
+          <span class="entnahme-datum">${DB.formatDateDE(en.datum)}</span>
+          ${en.buchungstyp?`<span class="entnahme-tag-badge">${en.buchungstyp}`+`</span>`:''}
+          ${en.grund?`<span class="entnahme-grund">${en.grund}</span>`:''}
+        </div>
+        <div class="entnahme-right">
+          <span class="entnahme-betrag ${pos?'pos':'neg'}">${pos?'+':'−'}${DB.formatDuration(Math.abs(en.betragMin))}</span>
+          <button class="icon-btn ${pos?'pos':'neg'}" onclick="App.openEntnahmeEdit(${en.id})">${icon_pen}</button>
+        </div>
+      </div>`;
+    }).join('');
 
     let html = '';
-    const orderedKeys = Object.keys(groups).sort((a,b) => {
-      if (a==='__week__') return -1; if (b==='__week__') return 1;
-      return b.localeCompare(a);
-    });
 
-    orderedKeys.forEach(key => {
-      const group = groups[key];
-      const isOpen = this._expanded[key] !== false;
-      const label  = key==='__week__' ? 'Diese Woche'
-        : (() => { const [y,m]=key.split('-'); return `${monthNames[parseInt(m)-1]} ${y}`; })();
-      const count  = group.items.length;
-
+    // Current week group
+    if (weekItems.length) {
+      const open = this._expanded['__week__'] !== false;
       html += `<div class="zk-group">
-        <div class="zk-group-header" onclick="Zeitkonto.toggleGroup('${key}')">
-          <span class="zk-group-label">${label}</span>
-          <span class="zk-group-meta">${count} Eintrag${count!==1?'e':''}</span>
-          <svg class="zk-group-arrow ${isOpen?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="zk-group-header" onclick="Zeitkonto.toggleGroup('__week__')">
+          <span class="zk-group-label">Diese Woche</span>
+          <span class="zk-group-meta">${weekItems.length} Eintrag${weekItems.length!==1?'e':''}</span>
+          ${arrowSvg(open)}
+        </div>
+        ${open ? `<div class="kontobuchungen-list">${renderItems(weekItems)}</div>` : ''}
+      </div>`;
+    }
+
+    // Year groups (descending)
+    const years = Object.keys(byYear).sort((a,b) => b-a);
+    years.forEach(yr => {
+      const yearOpen = this._expanded[`y-${yr}`] !== false ? false : false; // years always closed by default
+      // But we DO expand years if explicitly toggled
+      const yOpen = this._expanded[`y-${yr}`] === true;
+      const monthKeys = Object.keys(byYear[yr]).sort((a,b)=>b.localeCompare(a));
+      const yearTotal = monthKeys.reduce((s,k)=>s+byYear[yr][k].length,0);
+
+      html += `<div class="zk-group zk-year-group">
+        <div class="zk-group-header zk-year-header" onclick="Zeitkonto.toggleGroup('y-${yr}')">
+          <span class="zk-group-label">${yr}</span>
+          <span class="zk-group-meta">${yearTotal} Eintrag${yearTotal!==1?'e':''}</span>
+          ${arrowSvg(yOpen)}
         </div>`;
 
-      if (isOpen) {
-        html += `<div class="kontobuchungen-list">`;
-        group.items.forEach(en => {
-          const pos = en.betragMin < 0;
-          html += `
-          <div class="entnahme-item">
-            <div class="entnahme-left">
-              <span class="entnahme-datum">${DB.formatDateDE(en.datum)}</span>
-              ${en.buchungstyp?`<span class="entnahme-tag-badge">${en.buchungstyp}</span>`:''}
-              ${en.grund?`<span class="entnahme-grund">${en.grund}</span>`:''}
+      if (yOpen) {
+        monthKeys.forEach(mk => {
+          const items = byYear[yr][mk];
+          const mOpen = this._expanded[mk] === true;
+          const [, m] = mk.split('-');
+          html += `<div class="zk-month-group">
+            <div class="zk-group-header zk-month-header" onclick="Zeitkonto.toggleGroup('${mk}')">
+              <span class="zk-group-label">${monthNames[parseInt(m)-1]}</span>
+              <span class="zk-group-meta">${items.length} Eintrag${items.length!==1?'e':''}</span>
+              ${arrowSvg(mOpen)}
             </div>
-            <div class="entnahme-right">
-              <span class="entnahme-betrag ${pos?'pos':'neg'}">${pos?'+':'−'}${DB.formatDuration(Math.abs(en.betragMin))}</span>
-              <button class="icon-btn ${pos?'pos':'neg'}" onclick="App.openEntnahmeEdit(${en.id})">${icon_pen}</button>
-            </div>
+            ${mOpen ? `<div class="kontobuchungen-list">${renderItems(items)}</div>` : ''}
           </div>`;
         });
-        html += `</div>`;
       }
+
       html += `</div>`;
     });
 
-    return html;
+    return html || '<p class="no-data">Noch keine Buchungen</p>';
   },
 
   toggleGroup(key) {
-    if (!this._expanded) this._expanded = { '__week__': true };
-    this._expanded[key] = !(this._expanded[key] !== false);
+    if (!this._expanded) this._expanded = {};
+    if (key === '__week__') {
+      this._expanded[key] = !(this._expanded[key] !== false);
+    } else {
+      // Default is closed (false), toggle to true/false
+      this._expanded[key] = this._expanded[key] !== true;
+    }
     this.render();
   }
 };

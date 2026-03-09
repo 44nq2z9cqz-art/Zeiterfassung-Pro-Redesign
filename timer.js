@@ -126,16 +126,26 @@ const Timer = {
           pel.textContent = `${pMin}:${String(pSecRest).padStart(2,'0')} min`;
         }
       }
+      // Live progress bar update
+      const barFill = document.getElementById('live-bar-fill');
+      if (barFill) {
+        const s2 = DB.getSettings();
+        const soll2 = DB.getSollMinuten(today, s2);
+        if (soll2 > 0) {
+          const pct = Math.min(100, Math.round(netto / soll2 * 100));
+          barFill.style.width = pct + '%';
+        }
+      }
     }
   },
 
   // SVG icons
-  _svgPlay:  `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg>`,
-  _svgStop:  `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg>`,
-  _svgPause: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`,
-  _svgResume:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>`,
-  _svgSpin:  `<svg class="spin-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
-  _svgPauseBlink: `<svg class="blink-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`,
+  _svgPlay:  `<svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg>`,
+  _svgStop:  `<svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg>`,
+  _svgPause: `<svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`,
+  _svgResume:`<svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>`,
+  _svgSpin:  `<svg class="spin-icon" width="55" height="55" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
+  _svgPauseBlink: `<svg class="blink-icon" width="55" height="55" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`,
 
   render() {
     const container = document.getElementById('timer-section');
@@ -169,20 +179,18 @@ const Timer = {
       indicator = `<span class="badge badge-done">Abgeschlossen</span>`;
 
     // Animated border state
-    const cardClass = this.state.pauseLaufend ? 'timer-card card-pause-anim'
-                    : this.state.laufend      ? 'timer-card card-run-anim'
-                    : 'timer-card';
+    const cardClass = 'timer-card';
 
     container.innerHTML = `
-      <div class="${cardClass}" id="main-timer-card">
-        <canvas id="anim-canvas" style="position:absolute;top:0;left:0;pointer-events:none;border-radius:16px;"></canvas>
+      <div class="${cardClass}" id="timer-card">
         <div class="timer-header">
           <div class="timer-date">
             <span class="timer-weekday">${wt[heute.getDay()]}</span>
             <span class="timer-datum">${datumStr}</span>
           </div>
-          ${indicator}
+          ${(!this.state.laufend && !this.state.pauseLaufend) ? indicator : ''}
         </div>
+        ${(this.state.laufend || this.state.pauseLaufend) ? `<div class="timer-running-indicator">${indicator}</div>` : ''}
         <div class="timer-zeiten">
           <div class="zeit-block">
             <span class="zeit-label">Beginn</span>
@@ -208,7 +216,7 @@ const Timer = {
             ${diff!==null?`<span class="diff-indicator ${diff>=0?'positive':'negative'}">${DB.formatDuration(diff,true)}</span>`:''}
           </div>
           <div class="soll-bar"><div class="soll-bar-fill ${diff!==null&&diff>=0?'over':''}"
-            style="width:${ist!==null?Math.min(100,Math.round(ist/soll*100)):0}%"></div></div>
+            id="live-bar-fill" style="width:${ist!==null?Math.min(100,Math.round(ist/soll*100)):0}%"></div></div>
         </div>`:''}
         ${e?.kommentar?`<div class="timer-kommentar"><span>${e.kommentar}</span></div>`:''}
         <div class="timer-buttons">${this._renderButtons(e, feiertag, tagTyp)}</div>
@@ -222,10 +230,7 @@ const Timer = {
         <span class="pause-live" id="live-pause-dauer">0:00 min</span>
       </div>`:''}`;
 
-    // Start animated border if needed
-    if (this.state.laufend || this.state.pauseLaufend) {
-      requestAnimationFrame(() => this._startBorderAnim());
-    }
+
   },
 
   _renderButtons(e, feiertag, tagTyp) {
@@ -249,69 +254,5 @@ const Timer = {
     return '';
   },
 
-  // Animated border on canvas
-  _animFrame: null,
-  _animStart: null,
-
-  _startBorderAnim() {
-    if (this._animFrame) cancelAnimationFrame(this._animFrame);
-    const card = document.getElementById('main-timer-card');
-    const canvas = document.getElementById('anim-canvas');
-    if (!card || !canvas) return;
-
-    const color = this.state.pauseLaufend ? '#4a7cb5' : '#4a7c59';
-    const r = 16; // border-radius
-
-    const resize = () => {
-      canvas.width  = card.offsetWidth;
-      canvas.height = card.offsetHeight;
-    };
-    resize();
-
-    const draw = (ts) => {
-      if (!this._animStart) this._animStart = ts;
-      const elapsed = (ts - this._animStart) / 1000; // seconds
-      const period  = 3; // one full rotation in 3s
-      const progress = (elapsed % period) / period; // 0..1
-
-      const ctx = canvas.getContext('2d');
-      const W = canvas.width, H = canvas.height;
-      ctx.clearRect(0, 0, W, H);
-
-      // Build path: rounded rect perimeter
-      const totalLen = 2*(W-2*r) + 2*(H-2*r) + 2*Math.PI*r;
-      const arcLen   = 2*Math.PI*r;
-      const dashLen  = totalLen * 0.67; // 2/3 of perimeter
-
-      ctx.strokeStyle = color;
-      ctx.lineWidth   = 3;
-      ctx.lineCap     = 'round';
-      ctx.setLineDash([dashLen, totalLen - dashLen]);
-      ctx.lineDashOffset = -progress * totalLen;
-
-      ctx.beginPath();
-      ctx.moveTo(r, 0);
-      ctx.lineTo(W-r, 0);
-      ctx.arcTo(W, 0, W, r, r);
-      ctx.lineTo(W, H-r);
-      ctx.arcTo(W, H, W-r, H, r);
-      ctx.lineTo(r, H);
-      ctx.arcTo(0, H, 0, H-r, r);
-      ctx.lineTo(0, r);
-      ctx.arcTo(0, 0, r, 0, r);
-      ctx.closePath();
-      ctx.stroke();
-
-      // Continue only while still running
-      if (this.state.laufend || this.state.pauseLaufend) {
-        this._animFrame = requestAnimationFrame(draw);
-      } else {
-        ctx.clearRect(0, 0, W, H);
-      }
-    };
-
-    this._animStart = null;
-    this._animFrame = requestAnimationFrame(draw);
-  }
 };
 window.Timer = Timer;

@@ -131,6 +131,15 @@ const App = {
           </div>
         </div>` : ''}
       </div>
+      <div class="co-fields co-fields-comment">
+        <div class="co-field" onclick="App.editKommentar('${dateStr}')">
+          <span class="co-field-label">Kommentar</span>
+          <div class="co-field-right">
+            <span class="co-field-val ${!e.kommentar?'missing':''}">${e.kommentar||'–'}</span>
+            <span class="co-field-icon">${icon_pen}</span>
+          </div>
+        </div>
+      </div>
       ${(e.start||e.end||e.tagTyp||e.kommentar) ? `
       <div class="co-delete" onclick="Calendar.deleteEintrag('${dateStr}')">
         <span>Tag löschen</span>
@@ -167,22 +176,27 @@ const App = {
   },
 
   editSoll(dateStr) {
-    if (!confirm(`Sollzeit für ${DB.formatDateDE(dateStr)} anpassen?`)) return;
     const e = DB.getEintrag(dateStr) || {};
     const s = DB.getSettings();
     const cur = typeof e.sollOverrideMinuten === 'number' ? e.sollOverrideMinuten : DB.getSollMinuten(dateStr, s);
+    const h = String(Math.floor(cur / 60)).padStart(2,'0');
+    const m = String(cur % 60).padStart(2,'0');
     document.getElementById('es-date').value = dateStr;
-    document.getElementById('es-drum-wrap').innerHTML = Drum.html('esSoll', cur, { maxH: 24 });
+    document.getElementById('es-time-input').value = `${h}:${m}`;
     document.getElementById('edit-soll-modal').classList.add('open');
-    requestAnimationFrame(() => Drum.initAll(document.getElementById('es-drum-wrap')));
+    setTimeout(() => document.getElementById('es-time-input').focus(), 150);
   },
 
   saveSoll() {
     const dateStr = document.getElementById('es-date').value;
-    DB.saveEintrag(dateStr, { sollOverrideMinuten: Drum.getMinutes('esSoll') });
+    const timeStr = document.getElementById('es-time-input').value || '08:00';
+    const [h, m] = timeStr.split(':');
+    const mins = parseInt(h||0) * 60 + parseInt(m||0);
+    DB.saveEintrag(dateStr, { sollOverrideMinuten: mins });
     this.closeModal('edit-soll-modal');
     App.showToast('Sollzeit gespeichert ✓', 'success');
     Calendar.selectedDate = dateStr; Calendar.render();
+    if (document.getElementById('cal-overlay')?.classList.contains('open')) App.openCalOverlay(dateStr);
   },
 
   editKommentar(dateStr) {
@@ -200,6 +214,7 @@ const App = {
     App.showToast('Gespeichert ✓', 'success');
     Calendar.selectedDate = dateStr; Calendar.render();
     if (dateStr === DB.todayStr()) Timer.render();
+    if (document.getElementById('cal-overlay')?.classList.contains('open')) App.openCalOverlay(dateStr);
   },
 
   setQuickKommentar(tag, btn) {
@@ -227,7 +242,7 @@ const App = {
         <div class="pause-info"><span class="pause-time">${p.start} – ${p.end}</span></div>
         <span class="pause-dauer">${App._fmtPauseSec(dispSek)}</span>
         <div class="pause-actions">
-          <button class="icon-btn danger" onclick="App.deletePauseFromModal('${dateStr}',${p.id})">🗑</button>
+          <button class="icon-btn danger" onclick="App.deletePauseFromModal('${dateStr}',${p.id})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
         </div>
       </div>`;
     }).join('');
@@ -898,25 +913,104 @@ const App = {
 };
 
 const Notifications = {
+  _lastBackupDay: null,
+  _pauseReminderFired: false,
+
   async init() {
-    const s = DB.getSettings();
-    if (s.pushNotifications && 'Notification' in window && Notification.permission === 'granted') this._schedule();
+    // Re-request permission silently if already granted
+    if ('Notification' in window && Notification.permission !== 'granted') {
+      const s = DB.getSettings();
+      if (s.pushNotifications) await Notification.requestPermission();
+    }
+    this._schedule();
   },
+
   async requestPermission() {
     if (!('Notification' in window)) { App.showToast('Nicht unterstützt', 'error'); return; }
     const p = await Notification.requestPermission();
     if (p === 'granted') { App.showToast('Benachrichtigungen aktiv ✓', 'success'); this._schedule(); }
     else App.showToast('Benachrichtigungen abgelehnt', 'error');
   },
+
+  _notify(title, body) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    new Notification(title, { body, icon: 'icon-192.png' });
+  },
+
   _schedule() {
-    const s = DB.getSettings();
-    setInterval(() => {
-      const now = new Date();
-      const ts  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      const today = DB.todayStr(); const e = DB.getEintrag(today);
-      if (s.startErinnerung === ts && !e?.start) new Notification('Zeiterfassung', { body: '⏰ Arbeitszeit starten?', icon: 'icon-192.png' });
-      if (s.endeErinnerung  === ts && e?.start && !e?.end) new Notification('Zeiterfassung', { body: '🔔 Arbeitstag beenden?', icon: 'icon-192.png' });
-    }, 60000);
+    // Clear old interval
+    if (this._interval) clearInterval(this._interval);
+    this._lastMinute = '';
+
+    this._interval = setInterval(() => {
+      const s = DB.getSettings();
+      if (!s.pushNotifications || !('Notification' in window) || Notification.permission !== 'granted') return;
+
+      const now   = new Date();
+      const today = DB.todayStr();
+      const e     = DB.getEintrag(today);
+      const hh    = String(now.getHours()).padStart(2,'0');
+      const mm    = String(now.getMinutes()).padStart(2,'0');
+      const ts    = `${hh}:${mm}`;
+
+      // Prevent double-firing in same minute
+      if (ts === this._lastMinute) return;
+      this._lastMinute = ts;
+
+      // Arbeitsbeginn-Erinnerung
+      if (s.startErinnerung && s.startErinnerung === ts && !e?.start) {
+        this._notify('Zeiterfassung', 'Arbeitszeit starten?');
+      }
+
+      // Arbeitsende-Erinnerung
+      if (s.endeErinnerung && s.endeErinnerung === ts && e?.start && !e?.end) {
+        this._notify('Zeiterfassung', 'Arbeitstag beenden?');
+      }
+
+      // Datensicherungs-Erinnerung (täglich einmal zur eingestellten Zeit)
+      if (s.pushDatensicherung && s.datensicherungZeit) {
+        const dayKey = today;
+        if (s.datensicherungZeit === ts && this._lastBackupDay !== dayKey) {
+          this._lastBackupDay = dayKey;
+          this._notify('Zeiterfassung', 'Bitte Datensicherung durchführen');
+        }
+      }
+
+      // Pause-Erinnerung: nach 5h15min ohne Pause
+      if (e?.start && !e?.end) {
+        const pausen = (e.pausen || []);
+        const lastPauseEnd = pausen.length
+          ? pausen.reduce((a,p)=>p.id>a?p.id:a, 0) // use id as proxy
+          : null;
+        const startMs = new Date(`${today}T${e.start}:00`).getTime();
+        const pauGesamt = pausen.reduce((a,p)=>a+(p.dauer||0),0);
+        // Time since last pause ended (or since start if no pauses)
+        const pauseActiveMs = Timer.state.pauseLaufend && Timer.state.aktuellesPause
+          ? (now - Timer.state.aktuellesPause.start) : 0;
+        const netto = Math.floor((now - startMs) / 60000) - pauGesamt - Math.floor(pauseActiveMs/60000);
+        const timeSinceLastPause = pauGesamt > 0
+          ? (() => {
+              // find the latest pause end time
+              const sorted = [...pausen].sort((a,b)=>b.id-a.id);
+              const last = sorted[0];
+              if (!last?.end) return netto;
+              return Math.floor((now - new Date(`${today}T${last.end}:00`).getTime()) / 60000);
+            })()
+          : netto;
+
+        const THRESHOLD = 315; // 5h15min = 315 min
+        const fireKey = `pause-remind-${today}`;
+        if (timeSinceLastPause >= THRESHOLD && !localStorage.getItem(fireKey) && !Timer.state.pauseLaufend) {
+          localStorage.setItem(fireKey, '1');
+          const hStr = String(Math.floor(timeSinceLastPause/60)).padStart(2,'0');
+          const mStr = String(timeSinceLastPause%60).padStart(2,'0');
+          this._notify('Zeiterfassung', `Mach mal Pause! Du hast schon ${hStr}:${mStr} ohne Pause durchgearbeitet`);
+        }
+        // Reset on new day
+        const yesterday = DB.dateAdd(today, -1);
+        localStorage.removeItem(`pause-remind-${yesterday}`);
+      }
+    }, 10000); // Check every 10s for accuracy
   }
 };
 
