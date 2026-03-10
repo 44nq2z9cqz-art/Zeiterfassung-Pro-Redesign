@@ -176,11 +176,11 @@ const Timer = {
     // Kachel indicator (animated icons + done)
     let kachelIcon = '';
     if (this.state.pauseLaufend)
-      kachelIcon = `<svg class="blink-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`;
+      kachelIcon = `<span class="timer-indicator pause-indicator">${this._svgPauseBlink}</span>`;
     else if (this.state.laufend)
-      kachelIcon = `<svg class="spin-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`;
+      kachelIcon = `<span class="timer-indicator run-indicator">${this._svgSpin}</span>`;
     else if (e?.end)
-      kachelIcon = `<svg class="done-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>`;
+      kachelIcon = `<span class="timer-indicator done-indicator">${this._svgDone}</span>`;
 
     // Animated border state
     const cardClass = 'timer-card';
@@ -195,7 +195,7 @@ const Timer = {
           ${headerBadge}
         </div>
 
-        ${kachelIcon ? `<div class="kachel-indicator ${e?.end?'done-indicator':''}">${kachelIcon}</div>` : ''}
+        ${kachelIcon ? `<div class="kachel-indicator">${kachelIcon}</div>` : ''}
         <div class="timer-zeiten">
           <div class="zeit-block">
             <span class="zeit-label">Beginn</span>
