@@ -78,7 +78,8 @@ const App = {
     const komOpen = this._coKomOpen;
 
     const icon_trash = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
-    const icon_pen   = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>`;
+    const icon_down  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const icon_up    = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`;
 
     const typen = [
       {id:'urlaub',label:'Urlaub'},{id:'krank',label:'Krank'},
@@ -96,9 +97,7 @@ const App = {
       <div class="co-pausen-list">
         ${pausen.length ? pausen.map(p => `
           <div class="co-pause-item">
-            <span class="co-pau-start">${p.start||'–'}</span>
-            <span class="co-pau-dash">–</span>
-            <span class="co-pau-end">${p.end||'–'}</span>
+            <span class="co-pause-time">${p.start||''} – ${p.end||''}</span>
             <span class="co-pause-dauer">${App._fmtPauseSec(p.dauerSek!==undefined?p.dauerSek:(p.dauer||0)*60)}</span>
             <button class="co-pause-del" onclick="App.coDeletePause('${dateStr}',${p.id})">${icon_trash}</button>
           </div>`).join('') : '<p class="co-no-data">Keine Pausen eingetragen</p>'}
@@ -134,21 +133,17 @@ const App = {
         </div>
       </div>
       <div class="co-fields">
-        <div class="co-field" onclick="document.getElementById('co-inp-start').showPicker()">
+        <div class="co-field">
           <span class="co-field-label">Arbeitsbeginn</span>
           <div class="co-field-right">
-            <span class="co-field-val ${!e.start?'missing':''}">${e.start||'–'}</span>
-            <span class="co-field-icon">${icon_pen}</span>
-            <input type="time" id="co-inp-start" class="co-time-hidden" value="${e.start||''}"
+            <input type="time" class="co-time-picker" value="${e.start||''}"
               onchange="App.coSaveZeit('${dateStr}','start',this.value)">
           </div>
         </div>
-        <div class="co-field" onclick="document.getElementById('co-inp-end').showPicker()">
+        <div class="co-field">
           <span class="co-field-label">Arbeitsende</span>
           <div class="co-field-right">
-            <span class="co-field-val ${!e.end?'missing':''}">${e.end||'–'}</span>
-            <span class="co-field-icon">${icon_pen}</span>
-            <input type="time" id="co-inp-end" class="co-time-hidden" value="${e.end||''}"
+            <input type="time" class="co-time-picker" value="${e.end||''}"
               onchange="App.coSaveZeit('${dateStr}','end',this.value)">
           </div>
         </div>
@@ -156,16 +151,14 @@ const App = {
           <span class="co-field-label">Pausen gesamt</span>
           <div class="co-field-right">
             <span class="co-field-val">${DB.formatDuration(pauGesamt)}</span>
-            <span class="co-field-icon">${icon_pen}</span>
+            <span class="co-field-icon">${pauOpen ? icon_up : icon_down}</span>
           </div>
         </div>
         ${pausenList}
-        <div class="co-field" onclick="document.getElementById('co-inp-soll').showPicker()">
+        <div class="co-field">
           <span class="co-field-label">Sollzeit</span>
           <div class="co-field-right">
-            <span class="co-field-val">${sollH}:${sollM}</span>
-            <span class="co-field-icon">${icon_pen}</span>
-            <input type="time" id="co-inp-soll" class="co-time-hidden" value="${sollH}:${sollM}"
+            <input type="time" class="co-time-picker" value="${sollH}:${sollM}"
               onchange="App.coSaveSoll('${dateStr}',this.value)">
           </div>
         </div>
@@ -181,7 +174,8 @@ const App = {
         <div class="co-field co-field-toggle" onclick="App.openCalOverlay('${dateStr}',{komOpen:${!komOpen}})">
           <span class="co-field-label">Kommentar</span>
           <div class="co-field-right">
-            <span class="co-field-icon">${icon_pen}</span>
+            <span class="co-field-val ${!e.kommentar&&!komOpen?'missing':''}">${e.kommentar||'–'}</span>
+            <span class="co-field-icon">${komOpen ? icon_up : icon_down}</span>
           </div>
         </div>
         ${kommentarField}
