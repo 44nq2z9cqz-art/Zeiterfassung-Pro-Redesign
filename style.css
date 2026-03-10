@@ -709,3 +709,51 @@ input[type="time"].ntf-input { font-family: inherit; }
   pointer-events: none;
   z-index: 2;
 }
+.done-indicator { color: #9b2c2c; }
+
+/* ── Cal Overlay inline pickers & pausen ─────────────────────────────── */
+.co-time-picker {
+  font-size: 1rem; font-weight: 600; color: var(--text-1);
+  border: none; background: transparent;
+  text-align: right; padding: 0;
+  -webkit-appearance: none;
+}
+.co-field-toggle { cursor: pointer; }
+.co-pausen-list {
+  background: var(--bg); border-radius: var(--r-sm);
+  padding: 10px 12px; margin: -8px 0 4px; display: flex; flex-direction: column; gap: 8px;
+}
+.co-pause-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .9rem; color: var(--text-1);
+}
+.co-pause-time { flex: 1; }
+.co-pause-dauer { color: var(--text-3); font-size: .85rem; }
+.co-pause-del { background: none; border: none; color: var(--red); padding: 0; cursor: pointer; display: flex; }
+.co-pause-add {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 8px; border-top: 0.5px solid var(--sep);
+}
+.co-time-inline {
+  font-size: .9rem; border: 1.5px solid var(--sep); border-radius: 8px;
+  padding: 5px 8px; background: white; flex: 1;
+}
+.co-pause-add-btn {
+  font-size: .85rem; font-weight: 600; color: var(--green);
+  background: none; border: none; cursor: pointer; white-space: nowrap;
+}
+.co-kommentar-inline {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 8px 0 4px;
+}
+.co-kommentar-textarea {
+  width: 100%; box-sizing: border-box;
+  font-size: .95rem; color: var(--text-1);
+  border: 1.5px solid var(--sep); border-radius: var(--r-sm);
+  padding: 10px 12px; resize: none; font-family: inherit;
+  background: var(--bg);
+}
+.co-kommentar-save {
+  align-self: flex-end;
+}
+.btn-sm { font-size: .85rem; padding: 6px 16px; }
