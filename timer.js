@@ -145,7 +145,6 @@ const Timer = {
   _svgPause: `<svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`,
   _svgResume:`<svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>`,
   _svgDone:  `<svg class="done-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>`,
-  _svgDone: `<svg class="done-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>`,
   _svgSpin:  `<svg class="spin-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
   _svgPauseBlink: `<svg class="blink-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`,
 
@@ -165,20 +164,23 @@ const Timer = {
     const datumStr = heute.toLocaleDateString('de-DE', {day:'2-digit',month:'long',year:'numeric'});
     const pauGesamt = (e?.pausen||[]).reduce((a,p)=>a+(p.dauer||0),0);
 
-    // Badge/indicator — right side of header
-    let indicator = '';
+    // Header badges (Feiertag, Urlaub, Krank)
+    let headerBadge = '';
     if (feiertag)
-      indicator = `<span class="badge badge-holiday">${feiertag}</span>`;
+      headerBadge = `<span class="badge badge-holiday">${feiertag}</span>`;
     else if (tagTyp==='urlaub')
-      indicator = `<span class="badge badge-vacation">Urlaubstag</span>`;
+      headerBadge = `<span class="badge badge-vacation">Urlaubstag</span>`;
     else if (tagTyp==='krank')
-      indicator = `<span class="badge badge-sick">Kranktag</span>`;
-    else if (this.state.pauseLaufend)
-      indicator = `<span class="timer-indicator pause-indicator">${this._svgPauseBlink}</span>`;
+      headerBadge = `<span class="badge badge-sick">Kranktag</span>`;
+
+    // Kachel indicator (animated icons + done)
+    let kachelIcon = '';
+    if (this.state.pauseLaufend)
+      kachelIcon = `<svg class="blink-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/></svg>`;
     else if (this.state.laufend)
-      indicator = `<span class="timer-indicator run-indicator">${this._svgSpin}</span>`;
+      kachelIcon = `<svg class="spin-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`;
     else if (e?.end)
-      indicator = `<span class="done-indicator">${this._svgDone}</span>`;
+      kachelIcon = `<svg class="done-icon" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>`;
 
     // Animated border state
     const cardClass = 'timer-card';
@@ -190,10 +192,10 @@ const Timer = {
             <span class="timer-weekday">${wt[heute.getDay()]}</span>
             <span class="timer-datum">${datumStr}</span>
           </div>
-          ${(!this.state.laufend && !this.state.pauseLaufend) ? indicator : ''}
+          ${headerBadge}
         </div>
 
-        ${(this.state.laufend || this.state.pauseLaufend || e?.end) ? `<div class="kachel-indicator">${indicator}</div>` : ''}
+        ${kachelIcon ? `<div class="kachel-indicator ${e?.end?'done-indicator':''}">${kachelIcon}</div>` : ''}
         <div class="timer-zeiten">
           <div class="zeit-block">
             <span class="zeit-label">Beginn</span>
