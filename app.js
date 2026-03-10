@@ -55,7 +55,11 @@ const App = {
   },
 
   // ─── Kalender Overlay ───────────────────────────────────────────────────────
-  openCalOverlay(dateStr) {
+  _coPauOpen: false,
+  _coKomOpen: false,
+
+  openCalOverlay(dateStr, opts) {
+    opts = opts || {};
     const e    = DB.getEintrag(dateStr) || {};
     const s    = DB.getSettings();
     const soll = DB.getSollMinuten(dateStr, s);
@@ -67,16 +71,50 @@ const App = {
     const tagTyp = e.tagTyp || '';
     const pauGesamt = (e.pausen||[]).reduce((a,p)=>a+(p.dauer||0),0);
 
-    const icon_pen   = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>`;
+    // toggle state
+    if (opts.pauOpen !== undefined) this._coPauOpen = opts.pauOpen;
+    if (opts.komOpen !== undefined) this._coKomOpen = opts.komOpen;
+    const pauOpen = this._coPauOpen;
+    const komOpen = this._coKomOpen;
+
     const icon_trash = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+    const icon_down  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const icon_up    = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`;
 
     const typen = [
-      {id:'urlaub',      label:'Urlaub'},
-      {id:'krank',       label:'Krank'},
-      {id:'gleittag',    label:'Gleittag'},
-      {id:'feiertag',    label:'Feiertag'},
-      {id:'dienstreise', label:'Dienstreise'},
+      {id:'urlaub',label:'Urlaub'},{id:'krank',label:'Krank'},
+      {id:'gleittag',label:'Gleittag'},{id:'feiertag',label:'Feiertag'},
+      {id:'dienstreise',label:'Dienstreise'},
     ];
+
+    // Sollzeit as HH:MM string
+    const sollH = String(Math.floor(soll/60)).padStart(2,'0');
+    const sollM = String(soll%60).padStart(2,'0');
+
+    // Pausen list (collapsible)
+    const pausen = [...(e.pausen||[])].sort((a,b)=>a.id-b.id);
+    const pausenList = pauOpen ? `
+      <div class="co-pausen-list">
+        ${pausen.length ? pausen.map(p => `
+          <div class="co-pause-item">
+            <span class="co-pause-time">${p.start||''} – ${p.end||''}</span>
+            <span class="co-pause-dauer">${App._fmtPauseSec(p.dauerSek!==undefined?p.dauerSek:(p.dauer||0)*60)}</span>
+            <button class="co-pause-del" onclick="App.coDeletePause('${dateStr}',${p.id})">${icon_trash}</button>
+          </div>`).join('') : '<p class="co-no-data">Keine Pausen eingetragen</p>'}
+        <div class="co-pause-add">
+          <input type="time" id="co-pau-start" class="co-time-inline">
+          <span>–</span>
+          <input type="time" id="co-pau-end" class="co-time-inline">
+          <button class="co-pause-add-btn" onclick="App.coAddPause('${dateStr}')">+ Pause</button>
+        </div>
+      </div>` : '';
+
+    // Kommentar field (collapsible)
+    const kommentarField = komOpen ? `
+      <div class="co-kommentar-inline">
+        <textarea id="co-kommentar-input" class="co-kommentar-textarea" rows="3" placeholder="Kommentar eingeben…">${e.kommentar||''}</textarea>
+        <button class="co-kommentar-save" onclick="App.coSaveKommentar('${dateStr}')">Speichern</button>
+      </div>` : '';
 
     const body = document.getElementById('cal-overlay-body');
     if (!body) return;
@@ -95,32 +133,33 @@ const App = {
         </div>
       </div>
       <div class="co-fields">
-        <div class="co-field" onclick="App.editZeit('${dateStr}','start')">
+        <div class="co-field">
           <span class="co-field-label">Arbeitsbeginn</span>
           <div class="co-field-right">
-            <span class="co-field-val ${!e.start?'missing':''}">${e.start||'–'}</span>
-            <span class="co-field-icon">${icon_pen}</span>
+            <input type="time" class="co-time-picker" value="${e.start||''}"
+              onchange="App.coSaveZeit('${dateStr}','start',this.value)">
           </div>
         </div>
-        <div class="co-field" onclick="App.editZeit('${dateStr}','end')">
+        <div class="co-field">
           <span class="co-field-label">Arbeitsende</span>
           <div class="co-field-right">
-            <span class="co-field-val ${!e.end?'missing':''}">${e.end||'–'}</span>
-            <span class="co-field-icon">${icon_pen}</span>
+            <input type="time" class="co-time-picker" value="${e.end||''}"
+              onchange="App.coSaveZeit('${dateStr}','end',this.value)">
           </div>
         </div>
-        <div class="co-field" onclick="App.editPausenDetail('${dateStr}')">
+        <div class="co-field co-field-toggle" onclick="App.openCalOverlay('${dateStr}',{pauOpen:${!pauOpen}})">
           <span class="co-field-label">Pausen gesamt</span>
           <div class="co-field-right">
             <span class="co-field-val">${DB.formatDuration(pauGesamt)}</span>
-            <span class="co-field-icon">${icon_pen}</span>
+            <span class="co-field-icon">${pauOpen ? icon_up : icon_down}</span>
           </div>
         </div>
-        <div class="co-field" onclick="App.editSoll('${dateStr}')">
+        ${pausenList}
+        <div class="co-field">
           <span class="co-field-label">Sollzeit</span>
           <div class="co-field-right">
-            <span class="co-field-val">${DB.formatDuration(soll)}</span>
-            <span class="co-field-icon">${icon_pen}</span>
+            <input type="time" class="co-time-picker" value="${sollH}:${sollM}"
+              onchange="App.coSaveSoll('${dateStr}',this.value)">
           </div>
         </div>
         ${diff !== null ? `
@@ -132,13 +171,14 @@ const App = {
         </div>` : ''}
       </div>
       <div class="co-fields co-fields-comment">
-        <div class="co-field" onclick="App.editKommentar('${dateStr}')">
+        <div class="co-field co-field-toggle" onclick="App.openCalOverlay('${dateStr}',{komOpen:${!komOpen}})">
           <span class="co-field-label">Kommentar</span>
           <div class="co-field-right">
-            <span class="co-field-val ${!e.kommentar?'missing':''}">${e.kommentar||'–'}</span>
-            <span class="co-field-icon">${icon_pen}</span>
+            <span class="co-field-val ${!e.kommentar&&!komOpen?'missing':''}">${e.kommentar||'–'}</span>
+            <span class="co-field-icon">${komOpen ? icon_up : icon_down}</span>
           </div>
         </div>
+        ${kommentarField}
       </div>
       ${(e.start||e.end||e.tagTyp||e.kommentar) ? `
       <div class="co-delete" onclick="Calendar.deleteEintrag('${dateStr}')">
@@ -147,6 +187,55 @@ const App = {
       </div>` : ''}`;
 
     document.getElementById('cal-overlay').classList.add('open');
+  },
+
+  // ── Inline save helpers ───────────────────────────────────────────────────
+  coSaveZeit(dateStr, field, val) {
+    if (!val) return;
+    DB.saveEintrag(dateStr, { [field]: val });
+    App.showToast('Gespeichert ✓', 'success');
+    Calendar.selectedDate = dateStr; Calendar.render();
+    if (dateStr === DB.todayStr()) Timer.render();
+    this.openCalOverlay(dateStr);
+  },
+
+  coSaveSoll(dateStr, val) {
+    if (!val) return;
+    const [h, m] = val.split(':');
+    DB.saveEintrag(dateStr, { sollOverrideMinuten: parseInt(h||0)*60 + parseInt(m||0) });
+    App.showToast('Sollzeit gespeichert ✓', 'success');
+    Calendar.selectedDate = dateStr; Calendar.render();
+    this.openCalOverlay(dateStr);
+  },
+
+  coSaveKommentar(dateStr) {
+    const val = (document.getElementById('co-kommentar-input')?.value || '').trim();
+    DB.saveEintrag(dateStr, { kommentar: val });
+    App.showToast('Gespeichert ✓', 'success');
+    Calendar.selectedDate = dateStr; Calendar.render();
+    this._coKomOpen = false;
+    this.openCalOverlay(dateStr);
+  },
+
+  coAddPause(dateStr) {
+    const start = document.getElementById('co-pau-start')?.value;
+    const end   = document.getElementById('co-pau-end')?.value;
+    if (!start || !end) { App.showToast('Bitte Start und Ende eingeben', 'error'); return; }
+    const sm = DB.timeToMinutes(start), em = DB.timeToMinutes(end);
+    if (em <= sm) { App.showToast('Ende muss nach Start liegen', 'error'); return; }
+    DB.addPause(dateStr, { start, end, dauer: em-sm, dauerSek: (em-sm)*60 });
+    Calendar.selectedDate = dateStr; Calendar.render();
+    if (dateStr === DB.todayStr()) { Timer.render(); App.renderHeutePausen(dateStr); }
+    App.showToast('Pause gespeichert ✓', 'success');
+    this.openCalOverlay(dateStr, {pauOpen: true});
+  },
+
+  coDeletePause(dateStr, id) {
+    if (!confirm('Pause löschen?')) return;
+    DB.deletePause(dateStr, id);
+    Calendar.selectedDate = dateStr; Calendar.render();
+    if (dateStr === DB.todayStr()) { Timer.render(); App.renderHeutePausen(dateStr); }
+    this.openCalOverlay(dateStr, {pauOpen: true});
   },
 
   // ─── Zeit-Edit mit nativem iOS-Picker ───────────────────────────────────
