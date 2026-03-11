@@ -733,7 +733,7 @@ input[type="time"].ntf-input { font-family: inherit; }
 /* Tabular pause rows */
 .co-pause-item {
   display: grid;
-  grid-template-columns: 42px 14px 42px 1fr auto auto;
+  grid-template-columns: 42px 14px 42px auto 1fr auto;
   align-items: center; gap: 0;
   font-size: 1rem; font-weight: 400; color: var(--text-1);
 }
@@ -770,7 +770,7 @@ input[type="time"].ntf-input { font-family: inherit; }
 /* ── Heute Pausen tabellarisch ───────────────────────────────────────── */
 .pause-item {
   display: grid;
-  grid-template-columns: 42px 14px 42px 1fr auto;
+  grid-template-columns: 42px 14px 42px auto 1fr;
   align-items: center;
   gap: 0;
   padding: 4px 0;
@@ -779,11 +779,11 @@ input[type="time"].ntf-input { font-family: inherit; }
 }
 .pau-start { text-align: left; }
 .pau-dash  { text-align: center; color: var(--text-3); }
-.pau-end   { text-align: right; }
-.pau-dauer { text-align: right; padding-right: 12px; color: var(--text-3); }
-.pau-icon  { display: flex; align-items: center; }
+.pau-end   { text-align: left; }
+.pau-icon  { display: flex; align-items: center; padding: 0 10px; }
 .pau-ok    { color: var(--green); }
 .pau-warn  { color: #9b2c2c; }
+.pau-dauer { text-align: right; color: var(--text-3); }
 
 /* Cal overlay pause end-time right-align */
 .co-pau-end-r { text-align: right; }

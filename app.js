@@ -47,8 +47,8 @@ const App = {
         <span class="pau-start">${p.start||'–'}</span>
         <span class="pau-dash">–</span>
         <span class="pau-end">${p.end||'–'}</span>
-        <span class="pau-dauer">${App._fmtPauseSec(dispSek)}</span>
         <span class="pau-icon ${ok?'pau-ok':'pau-warn'}">${ok?svgOk:svgWarn}</span>
+        <span class="pau-dauer">${App._fmtPauseSec(dispSek)}</span>
       </div>`;
     }).join('') +
     `<div class="pause-summe">Gesamt: ${DB.formatDuration(total)}</div>
@@ -110,8 +110,8 @@ const App = {
             <span class="co-pau-start">${p.start||'–'}</span>
             <span class="co-pau-dash">–</span>
             <span class="co-pau-end co-pau-end-r">${p.end||'–'}</span>
-            <span class="co-pause-dauer">${App._fmtPauseSec(p.dauerSek!==undefined?p.dauerSek:(p.dauer||0)*60)}</span>
             <span class="pau-icon ${(p.dauer||0)>=15?'pau-ok':'pau-warn'}">${(p.dauer||0)>=15?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`}</span>
+            <span class="co-pause-dauer">${App._fmtPauseSec(p.dauerSek!==undefined?p.dauerSek:(p.dauer||0)*60)}</span>
             <button class="co-pause-del" onclick="App.coDeletePause('${dateStr}',${p.id})">${icon_trash}</button>
           </div>`).join('') : '<p class="co-no-data">Keine Pausen eingetragen</p>'}
         <div class="co-pause-add">
