@@ -712,8 +712,18 @@ input[type="time"].ntf-input { font-family: inherit; }
 .done-indicator { color: #9b2c2c; }
 
 /* ── Cal Overlay inline ──────────────────────────────────────────────── */
-.co-time-hidden {
-  position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+/* Time input overlaid on entire co-field row — transparent but tappable on iOS */
+.co-time-wrap {
+  position: relative;
+}
+.co-time-overlay {
+  position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%;
+  cursor: pointer; font-size: 16px; /* prevent iOS zoom */
+  box-sizing: border-box;
+}
+.co-kommentar-preview {
+  max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--text-2);
 }
 .co-field-toggle { cursor: pointer; }
 .co-pausen-list {

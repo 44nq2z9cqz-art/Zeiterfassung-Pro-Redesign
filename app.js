@@ -134,23 +134,23 @@ const App = {
         </div>
       </div>
       <div class="co-fields">
-        <div class="co-field" onclick="document.getElementById('co-inp-start').showPicker()">
+        <div class="co-field co-time-wrap">
           <span class="co-field-label">Arbeitsbeginn</span>
           <div class="co-field-right">
             <span class="co-field-val ${!e.start?'missing':''}">${e.start||'–'}</span>
             <span class="co-field-icon">${icon_pen}</span>
-            <input type="time" id="co-inp-start" class="co-time-hidden" value="${e.start||''}"
-              onchange="App.coSaveZeit('${dateStr}','start',this.value)">
           </div>
+          <input type="time" class="co-time-overlay" value="${e.start||''}"
+            onchange="App.coSaveZeit('${dateStr}','start',this.value)">
         </div>
-        <div class="co-field" onclick="document.getElementById('co-inp-end').showPicker()">
+        <div class="co-field co-time-wrap">
           <span class="co-field-label">Arbeitsende</span>
           <div class="co-field-right">
             <span class="co-field-val ${!e.end?'missing':''}">${e.end||'–'}</span>
             <span class="co-field-icon">${icon_pen}</span>
-            <input type="time" id="co-inp-end" class="co-time-hidden" value="${e.end||''}"
-              onchange="App.coSaveZeit('${dateStr}','end',this.value)">
           </div>
+          <input type="time" class="co-time-overlay" value="${e.end||''}"
+            onchange="App.coSaveZeit('${dateStr}','end',this.value)">
         </div>
         <div class="co-field co-field-toggle" onclick="App.openCalOverlay('${dateStr}',{pauOpen:${!pauOpen}})">
           <span class="co-field-label">Pausen gesamt</span>
@@ -160,14 +160,14 @@ const App = {
           </div>
         </div>
         ${pausenList}
-        <div class="co-field" onclick="document.getElementById('co-inp-soll').showPicker()">
+        <div class="co-field co-time-wrap">
           <span class="co-field-label">Sollzeit</span>
           <div class="co-field-right">
             <span class="co-field-val">${sollH}:${sollM}</span>
             <span class="co-field-icon">${icon_pen}</span>
-            <input type="time" id="co-inp-soll" class="co-time-hidden" value="${sollH}:${sollM}"
-              onchange="App.coSaveSoll('${dateStr}',this.value)">
           </div>
+          <input type="time" class="co-time-overlay" value="${sollH}:${sollM}"
+            onchange="App.coSaveSoll('${dateStr}',this.value)">
         </div>
         ${diff !== null ? `
         <div class="co-field no-tap">
@@ -181,6 +181,7 @@ const App = {
         <div class="co-field co-field-toggle" onclick="App.openCalOverlay('${dateStr}',{komOpen:${!komOpen}})">
           <span class="co-field-label">Kommentar</span>
           <div class="co-field-right">
+            ${e.kommentar ? `<span class="co-field-val co-kommentar-preview">${e.kommentar.length>20?e.kommentar.slice(0,20)+'…':e.kommentar}</span>` : '<span class="co-field-val missing">–</span>'}
             <span class="co-field-icon">${icon_pen}</span>
           </div>
         </div>
