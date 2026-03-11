@@ -35,17 +35,29 @@ const App = {
     const el = document.getElementById('tages-pausen');
     if (!el) return;
     const e = DB.getEintrag(dateStr) || {};
-    const pausen = [...(e.pausen || [])].sort((a, b) => b.id - a.id);
+    const pausen = [...(e.pausen || [])].sort((a, b) => a.id - b.id);
     if (!pausen.length) { el.innerHTML = '<p class="no-data">Keine Pausen heute</p>'; return; }
     const total = pausen.reduce((a, p) => a + (p.dauer || 0), 0);
+    const svgOk   = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`;
+    const svgWarn = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
     el.innerHTML = pausen.map(p => {
       const dispSek = p.dauerSek !== undefined ? p.dauerSek : (p.dauer * 60);
+      const ok = (p.dauer || 0) >= 15;
       return `<div class="pause-item">
-        <div class="pause-info"><span class="pause-time">${p.start} – ${p.end}</span></div>
-        <span class="pause-dauer">${this._fmtPauseSec(dispSek)}</span>
+        <span class="pau-start">${p.start||'–'}</span>
+        <span class="pau-dash">–</span>
+        <span class="pau-end">${p.end||'–'}</span>
+        <span class="pau-dauer">${App._fmtPauseSec(dispSek)}</span>
+        <span class="pau-icon ${ok?'pau-ok':'pau-warn'}">${ok?svgOk:svgWarn}</span>
       </div>`;
     }).join('') +
-    `<div class="pause-summe">Gesamt: ${DB.formatDuration(total)}</div>`;
+    `<div class="pause-summe">Gesamt: ${DB.formatDuration(total)}</div>
+     <div class="pau-legend">
+       <span class="pau-icon pau-ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
+       <span class="pau-legend-text">Pause &ge; 15 Min</span>
+       <span class="pau-icon pau-warn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg></span>
+       <span class="pau-legend-text">Pause &lt; 15 Min</span>
+     </div>`;
   },
 
   // ─── Kalender Tag öffnen ─────────────────────────────────────────────────
@@ -83,7 +95,6 @@ const App = {
     const typen = [
       {id:'urlaub',label:'Urlaub'},{id:'krank',label:'Krank'},
       {id:'gleittag',label:'Gleittag'},{id:'feiertag',label:'Feiertag'},
-      {id:'dienstreise',label:'Dienstreise'},
     ];
 
     // Sollzeit as HH:MM string
@@ -98,8 +109,9 @@ const App = {
           <div class="co-pause-item">
             <span class="co-pau-start">${p.start||'–'}</span>
             <span class="co-pau-dash">–</span>
-            <span class="co-pau-end">${p.end||'–'}</span>
+            <span class="co-pau-end co-pau-end-r">${p.end||'–'}</span>
             <span class="co-pause-dauer">${App._fmtPauseSec(p.dauerSek!==undefined?p.dauerSek:(p.dauer||0)*60)}</span>
+            <span class="pau-icon ${(p.dauer||0)>=15?'pau-ok':'pau-warn'}">${(p.dauer||0)>=15?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`}</span>
             <button class="co-pause-del" onclick="App.coDeletePause('${dateStr}',${p.id})">${icon_trash}</button>
           </div>`).join('') : '<p class="co-no-data">Keine Pausen eingetragen</p>'}
         <div class="co-pause-add">
@@ -155,7 +167,7 @@ const App = {
         <div class="co-field co-field-toggle" onclick="App.openCalOverlay('${dateStr}',{pauOpen:${!pauOpen}})">
           <span class="co-field-label">Pausen gesamt</span>
           <div class="co-field-right">
-            <span class="co-field-val">${DB.formatDuration(pauGesamt)}</span>
+            <span class="co-field-val">${DB.formatDuration(pauGesamt).replace(/ h$/,"")}</span>
             <span class="co-field-icon">${icon_pen}</span>
           </div>
         </div>
@@ -173,7 +185,7 @@ const App = {
         <div class="co-field no-tap">
           <span class="co-field-label">Differenz</span>
           <div class="co-field-right">
-            <span class="co-field-val ${diff>=0?'pos':'neg'}">${DB.formatDuration(diff,true)}</span>
+            <span class="co-field-val ${diff>=0?'pos':'neg'}">${DB.formatDuration(diff,true).replace(/ h$/,"")}</span>
           </div>
         </div>` : ''}
       </div>
