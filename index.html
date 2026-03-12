@@ -263,7 +263,89 @@
   <script src="timer.js"></script>
   <script src="calendar.js"></script>
   <script src="zeitkonto.js"></script>
+  <script src="urlaubskonto.js"></script>
   <script src="settings.js"></script>
   <script src="app.js"></script>
+
+  <!-- Urlaubskonto Buchung Modal -->
+  <div class="modal" id="uk-buchung-modal">
+    <div class="modal-overlay" onclick="Urlaubskonto.closeBuchungModal()"></div>
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 id="uk-modal-title">Neue Urlaubskonto-Buchung</h3>
+        <button class="modal-close" onclick="Urlaubskonto.closeBuchungModal()">✕</button>
+      </div>
+      <div class="modal-body edit-form">
+        <input type="hidden" id="uk-id">
+        <div class="form-group">
+          <label class="form-label">Datum</label>
+          <input type="date" class="form-input" id="uk-datum">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Art der Buchung</label>
+          <div class="sign-tabs">
+            <button class="sign-tab" id="uk-sign-minus" onclick="Urlaubskonto._setUkSign(1)">− Abzug</button>
+            <button class="sign-tab active" id="uk-sign-plus" onclick="Urlaubskonto._setUkSign(-1)">+ Gutschrift</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Anzahl Tage</label>
+          <input type="text" class="form-input" id="uk-tage" placeholder="z.B. 30 oder 2,5" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Buchungstyp</label>
+          <div class="quick-tags">
+            <button class="uk-tag quick-tag" data-tag="Vortrag"      onclick="Urlaubskonto.setUkTag('Vortrag',this)">Vortrag</button>
+            <button class="uk-tag quick-tag" data-tag="Jahresurlaub" onclick="Urlaubskonto.setUkTag('Jahresurlaub',this)">Jahresurlaub</button>
+            <button class="uk-tag quick-tag" data-tag="Sonderurlaub" onclick="Urlaubskonto.setUkTag('Sonderurlaub',this)">Sonderurlaub</button>
+            <button class="uk-tag quick-tag" data-tag="Korrektur"    onclick="Urlaubskonto.setUkTag('Korrektur',this)">Korrektur</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kommentar</label>
+          <textarea class="form-input" id="uk-kommentar" rows="2" placeholder="Optional…"></textarea>
+        </div>
+        <div class="en-action-row">
+          <button class="btn-primary" style="flex:1;background:#4a7cb5;border-color:#4a7cb5" onclick="Urlaubskonto.saveBuchung()">Speichern</button>
+          <button id="uk-delete-btn" class="btn-delete-entnahme" onclick="Urlaubskonto.deleteBuchung()" style="display:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Urlaubsantrag Modal -->
+  <div class="modal" id="uk-antrag-modal">
+    <div class="modal-overlay" onclick="Urlaubskonto.closeAntragModal()"></div>
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 id="uka-modal-title">Neuer Urlaubsantrag</h3>
+        <button class="modal-close" onclick="Urlaubskonto.closeAntragModal()">✕</button>
+      </div>
+      <div class="modal-body edit-form">
+        <input type="hidden" id="uka-id">
+        <div class="form-group">
+          <label class="form-label">Von</label>
+          <input type="date" class="form-input" id="uka-von" onchange="Urlaubskonto.updateAntragTage()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bis</label>
+          <input type="date" class="form-input" id="uka-bis" onchange="Urlaubskonto.updateAntragTage()">
+        </div>
+        <div class="form-group">
+          <div id="uka-tage-info" class="uk-tage-info"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kommentar</label>
+          <textarea class="form-input" id="uka-kommentar" rows="2" placeholder="Optional…"></textarea>
+        </div>
+        <div class="en-action-row">
+          <button class="btn-primary" style="flex:1;background:#4a7cb5;border-color:#4a7cb5" onclick="Urlaubskonto.saveAntrag()">Speichern</button>
+          <button id="uka-delete-btn" class="btn-delete-entnahme" onclick="Urlaubskonto.deleteAntrag()" style="display:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
