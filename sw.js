@@ -1,9 +1,16 @@
-// SW deaktiviert — meldet sich sofort ab und löscht alle Caches
-self.addEventListener('install', () => self.skipWaiting());
+// SW-RESET: löscht alle alten Caches und verwendet kein Caching mehr
+self.addEventListener('install', e => {
+  self.skipWaiting();
+});
+
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k))))
-      .then(() => self.registration.unregister())
       .then(() => self.clients.claim())
   );
+});
+
+// Network only — kein Cache
+self.addEventListener('fetch', e => {
+  e.respondWith(fetch(e.request));
 });

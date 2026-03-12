@@ -1,8 +1,7 @@
 // App Controller v2.1
 const App = {
   init() {
-    // SW deaktiviert — kein Caching
-    if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(console.error);
     Timer.init();
     Calendar.init();
     Zeitkonto.render();

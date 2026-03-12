@@ -796,34 +796,3 @@ input[type="time"].ntf-input { font-family: inherit; }
   font-size: .8rem; color: var(--text-3);
 }
 .pau-legend-text { margin-right: 10px; }
-
-/* ── Urlaubskonto ──────────────────────────────────────────────────────── */
-.zk-tab-switcher {
-  display: flex; gap: 8px; padding: 4px 0;
-}
-.zk-tab-btn {
-  flex: 1; padding: 8px 12px; border-radius: 20px; border: 1.5px solid #4a7cb5;
-  background: transparent; color: #4a7cb5; font-size: .9rem; font-weight: 600;
-  cursor: pointer; transition: background .15s, color .15s;
-}
-.zk-tab-btn.active {
-  background: #4a7cb5; color: #fff;
-}
-.uk-kacheln .zk-kachel {
-  border-top: 3px solid #4a7cb5;
-}
-.zk-unit {
-  font-size: .75rem; font-weight: 400; color: inherit; opacity: .7;
-}
-.neue-buchung-btn.uk-btn {
-  border-color: #4a7cb5; color: #4a7cb5;
-}
-.neue-buchung-btn.uk-btn:active {
-  background: #eaf0f8;
-}
-.uk-badge {
-  background: #dbeafe; color: #4a7cb5;
-}
-.uk-tage-info {
-  font-size: 1rem; font-weight: 600; color: #4a7cb5; min-height: 1.4em;
-}
