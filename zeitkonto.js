@@ -17,10 +17,8 @@ const Zeitkonto = {
 
     container.innerHTML = `
       <div class="zk-header">
-        <div class="zk-tab-switcher">
-          <button class="zk-tab-btn active">Zeitkonto</button>
-          <button class="zk-tab-btn" onclick="Urlaubskonto.render()">Urlaubskonto</button>
-        </div>
+        <h2>Zeitkonto</h2>
+        <span class="zk-stand-hint">Stand: Ende ${DB.formatDateDE(standDatum)}</span>
       </div>
       <div class="zk-kacheln-grid">
         ${kachelHtml('Gesamtsaldo', ue.gesamt, 'zk-gesamt')}
