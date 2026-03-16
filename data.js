@@ -1,10 +1,10 @@
 // Data Layer v2.0
 const DB = {
   KEYS: {
-    EINTRAEGE:    'ze_eintraege',
-    SETTINGS:     'ze_settings',
-    UEBERSTUNDEN: 'ze_ueberstunden',
-    ENTNAHMEN:    'ze_entnahmen',
+    EINTRAEGE:        'ze_eintraege',
+    SETTINGS:         'ze_settings',
+    UEBERSTUNDEN:     'ze_ueberstunden',
+    ENTNAHMEN:        'ze_entnahmen',
     URLAUB_BUCHUNGEN: 'ze_urlaub_buchungen',
     URLAUB_ANTRAEGE:  'ze_urlaub_antraege'
   },
@@ -308,38 +308,26 @@ const DB = {
     window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
   }
 };
-  // ── Urlaubskonto ───────────────────────────────────────────────────────────
+  // ── Urlaubskonto ────────────────────────────────────────────────────────
   getUrlaubBuchungen() {
     try { const e = localStorage.getItem(this.KEYS.URLAUB_BUCHUNGEN); return e ? JSON.parse(e) : []; }
     catch { return []; }
   },
-  saveUrlaubBuchungen(list) {
-    localStorage.setItem(this.KEYS.URLAUB_BUCHUNGEN, JSON.stringify(list));
-  },
+  saveUrlaubBuchungen(list) { localStorage.setItem(this.KEYS.URLAUB_BUCHUNGEN, JSON.stringify(list)); },
   addUrlaubBuchung(b) {
-    const list = this.getUrlaubBuchungen();
-    b.id = Date.now();
-    list.push(b);
-    this.saveUrlaubBuchungen(list);
-    return b;
+    const list = this.getUrlaubBuchungen(); b.id = Date.now(); list.push(b);
+    this.saveUrlaubBuchungen(list); return b;
   },
-  deleteUrlaubBuchung(id) {
-    this.saveUrlaubBuchungen(this.getUrlaubBuchungen().filter(b => b.id !== id));
-  },
+  deleteUrlaubBuchung(id) { this.saveUrlaubBuchungen(this.getUrlaubBuchungen().filter(b => b.id !== id)); },
 
   getUrlaubAntraege() {
     try { const e = localStorage.getItem(this.KEYS.URLAUB_ANTRAEGE); return e ? JSON.parse(e) : []; }
     catch { return []; }
   },
-  saveUrlaubAntraege(list) {
-    localStorage.setItem(this.KEYS.URLAUB_ANTRAEGE, JSON.stringify(list));
-  },
+  saveUrlaubAntraege(list) { localStorage.setItem(this.KEYS.URLAUB_ANTRAEGE, JSON.stringify(list)); },
   addUrlaubAntrag(a) {
-    const list = this.getUrlaubAntraege();
-    a.id = Date.now();
-    list.push(a);
-    this.saveUrlaubAntraege(list);
-    return a;
+    const list = this.getUrlaubAntraege(); a.id = Date.now(); list.push(a);
+    this.saveUrlaubAntraege(list); return a;
   },
   deleteUrlaubAntrag(id) {
     const list = this.getUrlaubAntraege();
@@ -348,23 +336,18 @@ const DB = {
     return antrag;
   },
 
-  // Calculate working days (Mon-Fri, no Feiertage) counting halves for 24.12 + 31.12
+  // Arbeitstage berechnen (Mo–Fr, keine Feiertage, 24.12+31.12 = 0.5 wenn Werktag)
   calcUrlaubstage(fromStr, toStr) {
     let days = 0;
     let cur = new Date(fromStr + 'T00:00:00');
     const end = new Date(toStr + 'T00:00:00');
-    const year = parseInt(fromStr.substring(0,4));
     while (cur <= end) {
-      const dow = cur.getDay(); // 0=Sun, 6=Sat
+      const dow = cur.getDay();
       if (dow >= 1 && dow <= 5) {
         const ds = this.dateToStr(cur);
         if (!Feiertage.isFeiertag(ds)) {
           const m = cur.getMonth()+1, d = cur.getDate();
-          if ((m===12 && d===24) || (m===12 && d===31)) {
-            days += 0.5;
-          } else {
-            days += 1;
-          }
+          days += ((m===12 && d===24) || (m===12 && d===31)) ? 0.5 : 1;
         }
       }
       cur.setDate(cur.getDate() + 1);
@@ -372,16 +355,13 @@ const DB = {
     return days;
   },
 
-  // Urlaubskonto Gesamtsaldo (jahresübergreifend, kein Verfall)
+  // Gesamtsaldo jahresübergreifend — kein Verfall beim Jahreswechsel
   calcUrlaubSaldo() {
     const buchungen = this.getUrlaubBuchungen();
-    // Gutschriften (sign < 0) = Zugänge, Abzüge (sign > 0) = manuelle Korrekturen
     const zugaenge    = buchungen.filter(b => b.sign < 0).reduce((s,b) => s + b.tage, 0);
     const korrekturen = buchungen.filter(b => b.sign > 0).reduce((s,b) => s + b.tage, 0);
-
-    const antraege = this.getUrlaubAntraege();
-    const beantragt = antraege.reduce((s,a) => s + (a.tage||0), 0);
-
+    const antraege    = this.getUrlaubAntraege();
+    const beantragt   = antraege.reduce((s,a) => s + (a.tage||0), 0);
     return { zugaenge, korrekturen, beantragt, rest: zugaenge - korrekturen - beantragt };
   }
 };

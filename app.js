@@ -1,11 +1,7 @@
 // App Controller v2.1
 const App = {
   init() {
-    // SW komplett deaktiviert — alle alten Registrierungen entfernen
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-      caches.keys().then(ks => ks.forEach(k => caches.delete(k)));
-    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(console.error);
     Timer.init();
     Calendar.init();
     Zeitkonto.render();

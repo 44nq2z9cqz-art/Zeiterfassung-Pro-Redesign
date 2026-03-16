@@ -1,7 +1,7 @@
 // Urlaubskonto Tab v1.0
 const Urlaubskonto = {
   _expanded: null,
-  _ukSign: 1, // 1 = Abzug, -1 = Gutschrift
+  _ukSign: -1, // -1 = Gutschrift (default), 1 = Abzug
 
   render() {
     const container = document.getElementById('zeitkonto-container');
@@ -9,24 +9,17 @@ const Urlaubskonto = {
 
     const todayStr = DB.todayStr();
     const saldo = DB.calcUrlaubSaldo();
-
-    // Tage genommen: alle antraege mit bis <= today (jahresübergreifend)
     const antraege = DB.getUrlaubAntraege();
+
     const genommen = antraege
       .filter(a => a.bis <= todayStr)
       .reduce((s,a) => s + (a.tage||0), 0);
-    // Beantragt: alle antraege mit von > today
     const beantragt = antraege
       .filter(a => a.von > todayStr)
       .reduce((s,a) => s + (a.tage||0), 0);
 
-    const fmtT = (t) => {
-      if (t === Math.floor(t)) return `${t}`;
-      return `${Math.floor(t)},5`;
-    };
-
+    const fmtT = t => t === Math.floor(t) ? `${t}` : `${Math.floor(t)},5`;
     const blue = '#4a7cb5';
-
     const icon_pen = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>`;
 
     container.innerHTML = `
@@ -38,19 +31,19 @@ const Urlaubskonto = {
       </div>
 
       <div class="zk-kacheln-grid uk-kacheln">
-        <div class="zk-kachel zk-gesamt" style="border-color:${blue}">
-          <div class="zk-label" style="color:${blue}">Restlicher Urlaubsanspruch</div>
-          <div class="zk-wert" style="color:${blue}">${fmtT(saldo.rest)} <span class="zk-unit">Tage</span></div>
+        <div class="zk-kachel zk-gesamt">
+          <div class="zk-label">Restlicher Urlaubsanspruch</div>
+          <div class="zk-wert">${fmtT(saldo.rest)} <span class="zk-unit">Tage</span></div>
           <div class="zk-stand">Stand ${DB.formatDateDE(todayStr)}</div>
         </div>
         <div class="zk-row2">
-          <div class="zk-kachel zk-sockel" style="border-color:${blue}">
-            <div class="zk-label" style="color:${blue}">Genommener Urlaub</div>
-            <div class="zk-wert" style="color:${blue}">${fmtT(genommen)} <span class="zk-unit">Tage</span></div>
+          <div class="zk-kachel zk-sockel">
+            <div class="zk-label">Genommener Urlaub</div>
+            <div class="zk-wert">${fmtT(genommen)} <span class="zk-unit">Tage</span></div>
           </div>
-          <div class="zk-kachel zk-ueber" style="border-color:${blue}">
-            <div class="zk-label" style="color:${blue}">Beantragter Urlaub</div>
-            <div class="zk-wert" style="color:${blue}">${fmtT(beantragt)} <span class="zk-unit">Tage</span></div>
+          <div class="zk-kachel zk-ueber">
+            <div class="zk-label">Beantragter Urlaub</div>
+            <div class="zk-wert">${fmtT(beantragt)} <span class="zk-unit">Tage</span></div>
           </div>
         </div>
       </div>
@@ -68,7 +61,7 @@ const Urlaubskonto = {
 
   _buildBuchungen(icon_pen) {
     const buchungen = DB.getUrlaubBuchungen();
-    const antraege = DB.getUrlaubAntraege();
+    const antraege  = DB.getUrlaubAntraege();
     const all = [
       ...buchungen.map(b => ({ ...b, _type: 'buchung' })),
       ...antraege.map(a => ({ ...a, datum: a.von, _type: 'antrag' }))
@@ -99,17 +92,14 @@ const Urlaubskonto = {
 
     const monthNames = ['Januar','Februar','März','April','Mai','Juni',
                         'Juli','August','September','Oktober','November','Dezember'];
-    const arrowSvg = (open) => `<svg class="zk-group-arrow ${open?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const arrowSvg = open => `<svg class="zk-group-arrow ${open?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const fmtT = t => t === Math.floor(t) ? `${t}` : `${Math.floor(t)},5`;
 
-    const fmtT = (t) => t === Math.floor(t) ? `${t}` : `${Math.floor(t)},5`;
-
-    const renderItems = (items) => items.map(en => {
+    const renderItems = items => items.map(en => {
       if (en._type === 'antrag') {
-        const von = DB.formatDateDE(en.von);
-        const bis = DB.formatDateDE(en.bis);
         return `<div class="entnahme-item">
           <div class="entnahme-left">
-            <span class="entnahme-datum">${von} – ${bis}</span>
+            <span class="entnahme-datum">${DB.formatDateDE(en.von)} – ${DB.formatDateDE(en.bis)}</span>
             <span class="entnahme-tag-badge uk-badge">Urlaubsantrag</span>
             ${en.kommentar?`<span class="entnahme-grund">${en.kommentar}</span>`:''}
           </div>
@@ -181,31 +171,26 @@ const Urlaubskonto = {
 
   toggleGroup(key) {
     if (!this._expanded) this._expanded = {};
-    if (key === '__week__') {
-      this._expanded[key] = !(this._expanded[key] !== false);
-    } else {
-      this._expanded[key] = this._expanded[key] !== true;
-    }
+    this._expanded[key] = key === '__week__'
+      ? !(this._expanded[key] !== false)
+      : this._expanded[key] !== true;
     this.render();
   },
 
   // ── Buchung Modal ────────────────────────────────────────────────────────
   openBuchungModal(id) {
     const modal = document.getElementById('uk-buchung-modal');
-    const titleEl = document.getElementById('uk-modal-title');
-    const delBtn = document.getElementById('uk-delete-btn');
     document.getElementById('uk-id').value = '';
     document.getElementById('uk-datum').value = DB.todayStr();
     document.getElementById('uk-tage').value = '';
     document.getElementById('uk-kommentar').value = '';
-    this._ukSign = -1; // default Gutschrift
     document.querySelectorAll('.uk-tag').forEach(b => b.classList.remove('active'));
     this._setUkSign(-1);
 
     if (id) {
       const b = DB.getUrlaubBuchungen().find(x => x.id === id);
       if (b) {
-        titleEl.textContent = 'Urlaubsbuchung bearbeiten';
+        document.getElementById('uk-modal-title').textContent = 'Urlaubsbuchung bearbeiten';
         document.getElementById('uk-id').value = b.id;
         document.getElementById('uk-datum').value = b.datum;
         document.getElementById('uk-tage').value = String(b.tage).replace('.',',');
@@ -216,11 +201,11 @@ const Urlaubskonto = {
             if (btn.dataset.tag === b.buchungstyp) btn.classList.add('active');
           });
         }
-        delBtn.style.display = 'flex';
+        document.getElementById('uk-delete-btn').style.display = 'flex';
       }
     } else {
-      titleEl.textContent = 'Neue Urlaubskonto-Buchung';
-      delBtn.style.display = 'none';
+      document.getElementById('uk-modal-title').textContent = 'Neue Urlaubskonto-Buchung';
+      document.getElementById('uk-delete-btn').style.display = 'none';
     }
     modal.classList.add('open');
   },
@@ -237,20 +222,18 @@ const Urlaubskonto = {
   },
 
   saveBuchung() {
-    const id = document.getElementById('uk-id').value;
-    const datum = document.getElementById('uk-datum').value;
-    const tageRaw = document.getElementById('uk-tage').value.replace(',','.');
-    const tage = parseFloat(tageRaw);
-    const kommentar = document.getElementById('uk-kommentar').value.trim();
-    const activeTag = document.querySelector('.uk-tag.active');
+    const id      = document.getElementById('uk-id').value;
+    const datum   = document.getElementById('uk-datum').value;
+    const tage    = parseFloat(document.getElementById('uk-tage').value.replace(',','.'));
+    const kommentar  = document.getElementById('uk-kommentar').value.trim();
+    const activeTag  = document.querySelector('.uk-tag.active');
     const buchungstyp = activeTag ? activeTag.dataset.tag : '';
-
     if (!datum || isNaN(tage) || tage <= 0) return;
 
     const list = DB.getUrlaubBuchungen();
     if (id) {
       const idx = list.findIndex(b => b.id == id);
-      if (idx >= 0) { list[idx] = { ...list[idx], datum, tage, sign: this._ukSign, buchungstyp, kommentar }; }
+      if (idx >= 0) list[idx] = { ...list[idx], datum, tage, sign: this._ukSign, buchungstyp, kommentar };
       DB.saveUrlaubBuchungen(list);
     } else {
       DB.addUrlaubBuchung({ datum, tage, sign: this._ukSign, buchungstyp, kommentar });
@@ -274,8 +257,6 @@ const Urlaubskonto = {
   // ── Antrag Modal ─────────────────────────────────────────────────────────
   openAntragModal(id) {
     const modal = document.getElementById('uk-antrag-modal');
-    const delBtn = document.getElementById('uka-delete-btn');
-    const titleEl = document.getElementById('uka-modal-title');
     document.getElementById('uka-id').value = '';
     document.getElementById('uka-von').value = '';
     document.getElementById('uka-bis').value = '';
@@ -285,17 +266,17 @@ const Urlaubskonto = {
     if (id) {
       const a = DB.getUrlaubAntraege().find(x => x.id === id);
       if (a) {
-        titleEl.textContent = 'Urlaubsantrag bearbeiten';
+        document.getElementById('uka-modal-title').textContent = 'Urlaubsantrag bearbeiten';
         document.getElementById('uka-id').value = a.id;
         document.getElementById('uka-von').value = a.von;
         document.getElementById('uka-bis').value = a.bis;
         document.getElementById('uka-tage-info').textContent = `${this._fmtT(a.tage)} Arbeitstage`;
         document.getElementById('uka-kommentar').value = a.kommentar || '';
-        delBtn.style.display = 'flex';
+        document.getElementById('uka-delete-btn').style.display = 'flex';
       }
     } else {
-      titleEl.textContent = 'Neuer Urlaubsantrag';
-      delBtn.style.display = 'none';
+      document.getElementById('uka-modal-title').textContent = 'Neuer Urlaubsantrag';
+      document.getElementById('uka-delete-btn').style.display = 'none';
     }
     modal.classList.add('open');
   },
@@ -305,8 +286,7 @@ const Urlaubskonto = {
     const bis = document.getElementById('uka-bis').value;
     const info = document.getElementById('uka-tage-info');
     if (von && bis && bis >= von) {
-      const tage = DB.calcUrlaubstage(von, bis);
-      info.textContent = `${this._fmtT(tage)} Arbeitstage`;
+      info.textContent = `${this._fmtT(DB.calcUrlaubstage(von, bis))} Arbeitstage`;
     } else {
       info.textContent = '';
     }
@@ -315,15 +295,14 @@ const Urlaubskonto = {
   _fmtT(t) { return t === Math.floor(t) ? `${t}` : `${Math.floor(t)},5`; },
 
   saveAntrag() {
-    const id = document.getElementById('uka-id').value;
-    const von = document.getElementById('uka-von').value;
-    const bis = document.getElementById('uka-bis').value;
+    const id        = document.getElementById('uka-id').value;
+    const von       = document.getElementById('uka-von').value;
+    const bis       = document.getElementById('uka-bis').value;
     const kommentar = document.getElementById('uka-kommentar').value.trim();
     if (!von || !bis || bis < von) return;
-
     const tage = DB.calcUrlaubstage(von, bis);
 
-    // Mark calendar days as urlaub
+    // Kalendertage als Urlaub markieren
     let cur = new Date(von + 'T00:00:00');
     const end = new Date(bis + 'T00:00:00');
     while (cur <= end) {
@@ -331,9 +310,7 @@ const Urlaubskonto = {
       const dow = cur.getDay();
       if (dow >= 1 && dow <= 5 && !Feiertage.isFeiertag(ds)) {
         const e = DB.getEintrag(ds) || {};
-        if (!e.tagTyp || e.tagTyp === '') {
-          DB.saveEintrag(ds, { ...e, tagTyp: 'urlaub' });
-        }
+        if (!e.tagTyp) DB.saveEintrag(ds, { ...e, tagTyp: 'urlaub' });
       }
       cur.setDate(cur.getDate() + 1);
     }
@@ -341,12 +318,11 @@ const Urlaubskonto = {
     const list = DB.getUrlaubAntraege();
     if (id) {
       const idx = list.findIndex(a => a.id == id);
-      if (idx >= 0) { list[idx] = { ...list[idx], von, bis, tage, kommentar }; }
+      if (idx >= 0) list[idx] = { ...list[idx], von, bis, tage, kommentar };
       DB.saveUrlaubAntraege(list);
     } else {
       DB.addUrlaubAntrag({ von, bis, tage, kommentar });
     }
-
     this.closeAntragModal();
     this.render();
     if (window.Calendar) Calendar.render();
